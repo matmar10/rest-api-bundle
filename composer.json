@@ -19,7 +19,7 @@
         "doctrine/doctrine-bundle": "1.2.*"
     },
     "autoload": {
-        "psr-0": { "Lmh\\Bundle\\MoneyBundle": "src" }
+        "psr-0": { "Lmh\\Bundle\\RestApiBundle": "src" }
     },
-    "target-dir": "Lmh/Bundle/MoneyBundle"
+    "target-dir": ""
 }
