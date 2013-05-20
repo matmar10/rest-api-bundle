@@ -1,0 +1,26 @@
+{
+    "name": "lmh/money-bundle",
+    "description": "A Symfony Bundle that enables the use of @Api annotation to automatically serialize any return value from any controller using JMS Serializer.",
+    "keywords": ["rest", "rest api", "jms", "jms serializer bundle", "xml", "json", "symfony", "symfony bundle", "marshaling", "controller", "annotation"],
+    "type": "symfony-bundle",
+    "license": "Apache",
+    "authors": [
+        {
+            "name": "Matthew J. Martin",
+            "email": "matthew.mar10@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/symfony": "2.2.*",
+        "symfony/framework-bundle": "2.2.*",
+        "jms/serializer": "0.12.*",
+        "jms/serializer-bundle": "dev-master",
+        "doctrine/annotations": "~2.2,>=2.2.3",
+        "doctrine/doctrine-bundle": "1.2.*"
+    },
+    "autoload": {
+        "psr-0": { "Lmh\\Bundle\\MoneyBundle": "src" }
+    },
+    "target-dir": "Lmh/Bundle/MoneyBundle"
+}
