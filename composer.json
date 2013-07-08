@@ -14,12 +14,13 @@
         "php": ">=5.3.3",
         "symfony/symfony": "2.3.*",
         "symfony/framework-bundle": "2.3.*",
+        "symfony/monolog-bundle": "2.3.*",
         "jms/serializer": "0.12.*",
         "jms/serializer-bundle": "dev-master",
         "doctrine/doctrine-bundle": "1.2.*"
     },
     "autoload": {
-        "psr-0": { "Lmh\\Bundle\\RestApiBundle": "src" }
+        "psr-0": { "Lmh\\Bundle\\RestApiBundle": "" }
     },
-    "target-dir": ""
+    "target-dir": "Lmh/Bundle/RestApiBundle"
 }

@@ -6,6 +6,7 @@ use Lmh\Bundle\RestApiBundle\Annotation\Api;
 use Lmh\Bundle\RestApiBundle\Tests\TestClasses\RestApiBundleTestClass;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
+
 /**
  * @Api("xml", statusCode=202)
  */
