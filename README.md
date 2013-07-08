@@ -28,15 +28,15 @@ Add the bundle to the Kernel and run composer update:
 
 ```php
 
-// in app/AppKernel.php
-public function registerBundles()
-{
-    $bundles = array(
-        ...
-        new Lmh\Bundle\RestApiBundle\LmhRestApiBundle(),
-    );
+    // in app/AppKernel.php
+    public function registerBundles()
+    {
+        $bundles = array(
+            ...
+            new Lmh\Bundle\RestApiBundle\LmhRestApiBundle(),
+        );
 
-}
+    }
 
 ```
 
@@ -82,14 +82,14 @@ The value of the @Api annotation indicates the serialization type:
 
 ```php
 
-@Api("json")
-public function getPersonAction()
-{
-    $person = new Person();
-    $person->setName("Matthew J. Martin");
-    $person->setAge(28);
-    return $person;
-}
+    @Api("json")
+    public function getPersonAction()
+    {
+        $person = new Person();
+        $person->setName("Matthew J. Martin");
+        $person->setAge(28);
+        return $person;
+    }
 
 // results in: {"result":"success","return":{"name":"Matthew J. Martin","age":28}}
 
@@ -99,13 +99,13 @@ You can also specify a different default status code (for example, when an entit
 
 ```php
 
-@Api("json", responseCode=201)
-public function createPersonAction()
-{
-    $person = new Person();
-    // process the request, persist the entity, and then return it
-    return $person;
-}
+    @Api("json", responseCode=201)
+    public function createPersonAction()
+    {
+        $person = new Person();
+        // process the request, persist the entity, and then return it
+        return $person;
+    }
 
 ```
 
