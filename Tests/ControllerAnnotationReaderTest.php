@@ -28,6 +28,7 @@ class ControllerAnnotationReaderTest extends WebTestCase
         $container = $this->getKernel()->getContainer();
         $annotationReader = $container->get('annotation_reader');
         $this->controllerAnnotationReader = new ControllerAnnotationReader($annotationReader);
+        AnnotationRegistry::registerAutoloadNamespace('Lmh\\Bundle\\RestApiBundle\\Annotation', __DIR__.'/../../../../../');
     }
 
     public function testGetIsApi()
