@@ -20,7 +20,9 @@
         "doctrine/doctrine-bundle": "1.2.*"
     },
     "autoload": {
-        "psr-0": { "Lmh\\Bundle\\RestApiBundle": "" }
-    },
-    "target-dir": "Lmh/Bundle/RestApiBundle"
+        "psr-0": {
+            "Matmar10\\Bundle\\RestApiBundle\\Tests": "test",
+            "Matmar10\\Bundle\\RestApiBundle": "src"
+        }
+    }
 }
