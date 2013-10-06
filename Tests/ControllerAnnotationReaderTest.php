@@ -2,6 +2,7 @@
 
 namespace Lmh\Bundle\RestApiBundle\Tests;
 
+use Doctrine\Common\Annotations\AnnotationRegistry;
 use Lmh\Bundle\RestApiBundle\Service\ControllerAnnotationReader;
 use Lmh\Bundle\RestApiBundle\Tests\TestClasses\RestApiBundleTestJsonController;
 use Lmh\Bundle\RestApiBundle\Tests\TestClasses\RestApiBundleTestXmlController;
@@ -26,6 +27,7 @@ class ControllerAnnotationReaderTest extends WebTestCase
         $container = $this->getKernel()->getContainer();
         $annotationReader = $container->get('annotation_reader');
         $this->controllerAnnotationReader = new ControllerAnnotationReader($annotationReader);
+        AnnotationRegistry::registerAutoloadNamespace('Lmh\\Bundle\\RestApiBundle\\Annotation', __DIR__.'/../../../../../');
     }
 
     public function testGetIsApi()
