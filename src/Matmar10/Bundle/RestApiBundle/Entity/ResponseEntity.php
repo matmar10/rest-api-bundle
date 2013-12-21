@@ -4,8 +4,9 @@ namespace Matmar10\Bundle\RestApiBundle\Entity;
 
 use JMS\Serializer\Annotation\AccessType;
 use JMS\Serializer\Annotation\ExclusionPolicy;
-use JMS\Serializer\Annotation\Type;
+use JMS\Serializer\Annotation\Groups;
 use JMS\Serializer\Annotation\ReadOnly;
+use JMS\Serializer\Annotation\Type;
 
 /**
  * @AccessType("public_method")
@@ -15,17 +16,7 @@ class ResponseEntity
 {
 
     /**
-     * @Type("boolean")
-     * @ReadOnly
-     */
-    protected $success = true;
-
-    /**
-     * @ReadOnly
-     */
-    protected $return = null;
-
-    /**
+     * @Groups({"all", "debug"})
      * @Type("Matmar10\Bundle\RestApiBundle\Entity\RestApiExceptionEntity")
      * @ReadOnly
      */
@@ -39,25 +30,5 @@ class ResponseEntity
     public function getException()
     {
         return $this->exception;
-    }
-
-    public function setReturn($return)
-    {
-        $this->return = $return;
-    }
-
-    public function getReturn()
-    {
-        return $this->return;
-    }
-
-    public function setSuccess($success)
-    {
-        $this->success = $success;
-    }
-
-    public function getSuccess()
-    {
-        return $this->success;
     }
 }

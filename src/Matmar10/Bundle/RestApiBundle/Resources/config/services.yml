@@ -12,7 +12,7 @@ services:
 
     matmar10_rest_api.response_factory:
         class: %matmar10_rest_api.response_factory.class%
-        arguments: [ @serializer, @logger ]
+        arguments: [ @serializer, @logger, "%kernel.debug%" ]
         tags:
             - { name: monolog.logger, channel: matmar10_rest_api.response_factory }
 

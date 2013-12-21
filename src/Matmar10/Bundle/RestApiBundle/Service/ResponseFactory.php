@@ -4,6 +4,7 @@ namespace Matmar10\Bundle\RestApiBundle\Service;
 
 use Exception;
 use JMS\Serializer\Serializer;
+use JMS\Serializer\SerializationContext;
 use Matmar10\Bundle\RestApiBundle\Entity\ResponseEntity;
 use Matmar10\Bundle\RestApiBundle\Exception\SerializableExceptionInterface;
 use Symfony\Bridge\Monolog\Logger;
@@ -18,27 +19,26 @@ class ResponseFactory
 
     protected static $logger;
 
-    public function __construct(Serializer $serializer, Logger $logger)
+    protected $contexts;
+
+    public function __construct(Serializer $serializer, Logger $logger, $debug = false)
     {
         self::$serializer = $serializer;
         self::$logger = $logger;
+        $this->contexts = array('all');
+        if($debug) {
+            $this->contexts[] = 'debug';
+        }
     }
 
-    public function buildSuccessfulResponse($serializeType, $content, $statusCode = 200)
+    public function buildSuccessfulResponse($serializeType, $content, $statusCode = 200, $contexts = array())
     {
-        self::$logger->addDebug('building successful response', array(
-            'content' => $content,
-            'statusCode' => $statusCode,
-        ));
-
-        $response = new ResponseEntity();
-        $response->setReturn($content);
-        $serializedContent = self::$serializer->serialize($response, $serializeType);
-
-        self::$logger->addDebug('built successful response', array(
-            'serializedContent' => $serializedContent,
-            'statusCode' => $statusCode,
-        ));
+        if(count($contexts)) {
+            $contexts = SerializationContext::create()->setGroups($this->contexts);
+            $serializedContent = self::$serializer->serialize($content, $serializeType, $contexts);
+        } else {
+            $serializedContent = self::$serializer->serialize($content, $serializeType);
+        }
 
         return $this->buildResponse($serializeType, $serializedContent, $statusCode);
     }
@@ -47,11 +47,15 @@ class ResponseFactory
     {
 
         $response = new ResponseEntity();
-        $response->setSuccess(false);
-
         if($exception instanceof SerializableExceptionInterface) {
+            /**
+             * @var $exception \Matmar10\Bundle\RestApiBundle\Exception\SerializableExceptionInterface
+             */
             $mapToEntity = $exception->getSerializationEntityClassName();
             $exceptionEntity = new $mapToEntity($exception);
+            /**
+             * @var $exception \Matmar10\Bundle\RestApiBundle\Exception\StatusCodeInterface
+             */
             $statusCode = $exception->getHttpStatusCode();
         } else {
             $mapToEntity = 'Matmar10\Bundle\RestApiBundle\Entity\RestApiExceptionEntity';
@@ -60,7 +64,8 @@ class ResponseFactory
         }
 
         $response->setException($exceptionEntity);
-        $serializedContent = self::$serializer->serialize($response, $serializeType);
+        $contexts = SerializationContext::create()->setGroups($this->contexts);
+        $serializedContent = self::$serializer->serialize($response, $serializeType, $contexts);
         return $this->buildResponse($serializeType, $serializedContent, $statusCode);
     }
 

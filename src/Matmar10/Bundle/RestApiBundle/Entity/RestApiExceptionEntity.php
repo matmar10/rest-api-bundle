@@ -4,6 +4,7 @@ namespace Matmar10\Bundle\RestApiBundle\Entity;
 
 use Exception;
 use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Groups;
 use JMS\Serializer\Annotation\Type;
 use JMS\Serializer\Annotation\ReadOnly;
 
@@ -14,30 +15,35 @@ class RestApiExceptionEntity {
 
     /**
      * @Type("string")
+     * @Groups({"all", "debug"})
      * @ReadOnly
      */
     protected $message;
 
     /**
      * @Type("integer")
+     * @Groups({"all", "debug"})
      * @ReadOnly
      */
     protected $code;
 
     /**
      * @Type("string")
+     * @Groups({"debug"})
      * @ReadOnly
      */
     protected $file;
 
     /**
      * @Type("integer")
+     * @Groups({"debug"})
      * @ReadOnly
      */
     protected $line;
 
     /**
      * @Type("string")
+     * @Groups({"all", "debug"})
      * @ReadOnly
      */
     protected $error;
