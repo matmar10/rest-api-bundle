@@ -42,6 +42,8 @@ class Listener
 
         // read annotation for invoked controller action
         $annotation = self::$controllerAnnotationReader->getAnnotationForControllerAction($controller, $actionName);
+        print_r($annotation);
+        die();
 
         // set the annotation as metadata to be used in the kernel view event
         $request = $event->getRequest();

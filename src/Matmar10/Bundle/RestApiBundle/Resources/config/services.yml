@@ -1,33 +1,33 @@
 
 parameters:
 
-    lmh_rest_api.response_factory.class:               Matmar10\Bundle\RestApiBundle\Service\ResponseFactory
+    matmar10_rest_api.response_factory.class:               Matmar10\Bundle\RestApiBundle\Service\ResponseFactory
 
-    lmh_rest_api.controller_annotation_reader.class:   Matmar10\Bundle\RestApiBundle\Service\ControllerAnnotationReader
+    matmar10_rest_api.controller_annotation_reader.class:   Matmar10\Bundle\RestApiBundle\Service\ControllerAnnotationReader
 
-    lmh_rest_api.listener.view.class:                  Matmar10\Bundle\RestApiBundle\EventListener\Listener
+    matmar10_rest_api.listener.view.class:                  Matmar10\Bundle\RestApiBundle\EventListener\Listener
 
 
 services:
 
-    lmh_rest_api.response_factory:
-        class: %lmh_rest_api.response_factory.class%
+    matmar10_rest_api.response_factory:
+        class: %matmar10_rest_api.response_factory.class%
         arguments: [ @serializer, @logger ]
         tags:
-            - { name: monolog.logger, channel: lmh_rest_api.response_factory }
+            - { name: monolog.logger, channel: matmar10_rest_api.response_factory }
 
-    lmh_rest_api.controller_annotation_reader:
-        class: %lmh_rest_api.controller_annotation_reader.class%
+    matmar10_rest_api.controller_annotation_reader:
+        class: %matmar10_rest_api.controller_annotation_reader.class%
         arguments: [ @annotation_reader ] # wrap doctrine annotation reader
 
-    lmh_rest_api.event_listener.view:
-        class: %lmh_rest_api.listener.view.class%
-        arguments: [ @lmh_rest_api.response_factory, @lmh_rest_api.controller_annotation_reader, @logger ]
+    matmar10_rest_api.event_listener.view:
+        class: %matmar10_rest_api.listener.view.class%
+        arguments: [ @matmar10_rest_api.response_factory, @matmar10_rest_api.controller_annotation_reader, @logger ]
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
             - { name: kernel.event_listener, event: kernel.view, method: onKernelView }
             - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
-            - { name: monolog.logger, channel: lmh_rest_api.event_listener.view }
+            - { name: monolog.logger, channel: matmar10_rest_api.event_listener.view }
 
 
 

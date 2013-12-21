@@ -32,11 +32,9 @@ class ControllerAnnotationReader
         $annotation = $this->reader->getClassAnnotation($reflectionObject, self::ANNOTATION_CLASS_API);
         // if no annotation exists, construct an annotation indicating this is not an API Controller
         if(is_null($annotation)) {
-            $annotation = new ApiAnnotation(array(
-                'value' => false,
-            ));
+            $annotation = new ApiAnnotation();
+            $annotation->isApi = false;
         }
-        $annotation->processOptions();
         return $annotation;
     }
 
