@@ -90,6 +90,10 @@ class Listener
         $annotation = $request->attributes->get('_api_controller_metadata');
 
         // ignore if no API annotation present
+        if(!$annotation) {
+            return;
+        }
+
         if(!$annotation->getIsApi()) {
             return;
         }
