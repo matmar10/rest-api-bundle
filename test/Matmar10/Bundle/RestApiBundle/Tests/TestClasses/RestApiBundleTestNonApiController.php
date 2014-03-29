@@ -15,7 +15,7 @@ class RestApiBundleTestNonApiController extends Controller
     }
 
     /**
-     * @Api()
+     * @Api(statusCode="yxz")
      */
     public function invalidAnnotationAction()
     {

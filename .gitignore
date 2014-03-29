@@ -6,3 +6,7 @@ vendor/
 
 composer.lock
 
+# temp directories created when running tests
+test/Matmar10/Bundle/RestApiBundle/Tests/Fixtures/App/app/cache/
+test/Matmar10/Bundle/RestApiBundle/Tests/Fixtures/App/app/log/
+

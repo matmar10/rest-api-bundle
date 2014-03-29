@@ -2,7 +2,6 @@
 
 namespace Matmar10\Bundle\RestApiBundle\Service;
 
-use Matmar10\Bundle\RestApiBundle\Annotation\Api as ApiAnnotation;
 use Doctrine\Common\Annotations\Reader;
 use LogicException;
 use ReflectionObject;
@@ -13,7 +12,7 @@ class ControllerAnnotationReader
 
     protected $reader;
 
-    const ANNOTATION_CLASS_API = 'Matmar10\\Bundle\\RestApiBundle\\Annotation\\Api';
+    const ANNOTATION_CLASS = 'Matmar10\\Bundle\\RestApiBundle\\Annotation\\Api';
 
     public function __construct(Reader $reader)
     {
@@ -29,17 +28,11 @@ class ControllerAnnotationReader
     public function getAnnotationForController($controller)
     {
         $reflectionObject = new ReflectionObject($controller);
-        $annotation = $this->reader->getClassAnnotation($reflectionObject, self::ANNOTATION_CLASS_API);
-        // if no annotation exists, construct an annotation indicating this is not an API Controller
-        if(is_null($annotation)) {
-            $annotation = new ApiAnnotation();
-            $annotation->isApi = false;
-        }
-        return $annotation;
+        return $this->reader->getClassAnnotation($reflectionObject, self::ANNOTATION_CLASS);
     }
 
     /**
-     * Reads the API annotation from the controller
+     * Reads the API annotation from the controller's action
      *
      * @param $controller object The symfony controller
      * @param $actionName string The method name for the controller to read the API annotation for
@@ -47,14 +40,12 @@ class ControllerAnnotationReader
      */
     public function getAnnotationForControllerAction($controller, $actionName)
     {
-        $controllerAnnotation = $this->getAnnotationForController($controller);
         $reflectionMethod = new ReflectionMethod($controller, $actionName);
-        $annotation = $this->reader->getMethodAnnotation($reflectionMethod, self::ANNOTATION_CLASS_API);
+        $annotation = $this->reader->getMethodAnnotation($reflectionMethod, self::ANNOTATION_CLASS);
         // fallback to controller-level annotation
         if(is_null($annotation)) {
-            return $controllerAnnotation;
+            return $this->getAnnotationForController($controller);
         }
-        $annotation->processOptions();
         return $annotation;
     }
 

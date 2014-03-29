@@ -42,6 +42,11 @@ class Listener
 
         // read annotation for invoked controller action
         $annotation = self::$controllerAnnotationReader->getAnnotationForControllerAction($controller, $actionName);
+
+        if(!$annotation) {
+            return;
+        }
+
         // set the annotation as metadata to be used in the kernel view event
         $request = $event->getRequest();
         $request->attributes->set('_api_controller_metadata', $annotation);
@@ -60,7 +65,7 @@ class Listener
         $annotation = $request->attributes->get('_api_controller_metadata');
 
         // ignore if no API annotation present
-        if(!$annotation->getIsApi()) {
+        if(!$annotation) {
             return;
         }
 

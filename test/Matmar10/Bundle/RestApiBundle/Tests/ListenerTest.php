@@ -25,8 +25,8 @@ class ListenerTest extends WebTestCase
         static::$kernel = static::createKernel();
         static::$kernel->boot();
         $container = static::$kernel->getContainer();
-        $responseFactory = $container->get('lmh_rest_api.response_factory');
-        $annotationReader = $container->get('lmh_rest_api.controller_annotation_reader');
+        $responseFactory = $container->get('matmar10_rest_api.response_factory');
+        $annotationReader = $container->get('matmar10_rest_api.controller_annotation_reader');
         $logger = $container->get('logger');
         $this->listener = new Listener($responseFactory, $annotationReader, $logger);
     }
@@ -49,7 +49,6 @@ class ListenerTest extends WebTestCase
 
         $annotation = $event->getRequest()->attributes->get('_api_controller_metadata');
         $this->assertInstanceOf('Matmar10\Bundle\RestApiBundle\Annotation\Api', $annotation);
-        $this->assertEquals($expectedIsApi, $annotation->getIsApi());
 
         if($expectedIsApi) {
             $this->assertEquals($expectedSerializeType, $annotation->getSerializeType());
@@ -87,7 +86,7 @@ class ListenerTest extends WebTestCase
                 true,
                 'json',
                 202,
-                '{"success":true,"return":{"a":"A","b":1234,"c":false}}',
+                '{"a":"A","b":1234,"c":false}',
             ),
             'GET getBooleanAsJsonAction' => array(
                 new Request(array(), array(), array(), array(), array(), array(), array()),
@@ -97,7 +96,7 @@ class ListenerTest extends WebTestCase
                 true,
                 'json',
                 202,
-                '{"success":true,"return":true}',
+                'true',
             ),
             'GET getNullAsJsonAction' => array(
                 new Request(array(), array(), array(), array(), array(), array(), array()),
@@ -107,7 +106,7 @@ class ListenerTest extends WebTestCase
                 true,
                 'json',
                 202,
-                '{"success":true}',
+                'null',
             ),
             'GET getStringAsXmlAction' => array(
                 new Request(array(), array(), array(), array(), array(), array(), array()),
@@ -118,10 +117,7 @@ class ListenerTest extends WebTestCase
                 'xml',
                 201,
                 '<?xml version="1.0" encoding="UTF-8"?>
-<result>
-  <success>true</success>
-  <return><![CDATA[abcdef12345]]></return>
-</result>
+<result><![CDATA[abcdef12345]]></result>
 ',
             ),
             'GET getObjectAsXmlAction' => array(
@@ -134,12 +130,9 @@ class ListenerTest extends WebTestCase
                 202,
                 '<?xml version="1.0" encoding="UTF-8"?>
 <result>
-  <success>true</success>
-  <return>
-    <a><![CDATA[A]]></a>
-    <b>1234</b>
-    <c>false</c>
-  </return>
+  <a><![CDATA[A]]></a>
+  <b>1234</b>
+  <c>false</c>
 </result>
 ',
             ),
@@ -152,10 +145,7 @@ class ListenerTest extends WebTestCase
                 'xml',
                 202,
                 '<?xml version="1.0" encoding="UTF-8"?>
-<result>
-  <success>true</success>
-  <return>true</return>
-</result>
+<result>true</result>
 ',
             'GET getNullAsXmlAction' => array(
                 new Request(array(), array(), array(), array(), array(), array(), array()),
@@ -166,9 +156,7 @@ class ListenerTest extends WebTestCase
                 'xml',
                 202,
                 '<?xml version="1.0" encoding="UTF-8"?>
-<result>
-  <success>true</success>
-</result>
+<result></result>
 ',
             ),
             'GET getStringAsJsonAction' => array(
@@ -180,9 +168,7 @@ class ListenerTest extends WebTestCase
                 'json',
                 201,
                 '<?xml version="1.0" encoding="UTF-8"?>
-<result>
-  <success>true</success>
-</result>
+<result>true</result>
 ',
                 ),
             ),

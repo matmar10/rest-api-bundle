@@ -30,20 +30,6 @@ class ControllerAnnotationReaderTest extends WebTestCase
         $this->controllerAnnotationReader = new ControllerAnnotationReader($annotationReader);
     }
 
-    public function testGetIsApi()
-    {
-
-        $jsonController = new RestApiBundleTestJsonController();
-        $this->assertEquals(true, $this->controllerAnnotationReader->getAnnotationForController($jsonController)->getIsApi());
-
-        $xmlController = new RestApiBundleTestXmlController();
-        $this->assertEquals(true, $this->controllerAnnotationReader->getAnnotationForController($xmlController)->getIsApi());
-
-        $nonApiController = new RestApiBundleTestNonApiController();
-        $this->assertEquals(false, $this->controllerAnnotationReader->getAnnotationForController($nonApiController)->getIsApi());
-
-    }
-
     public function testGetSerializeTypeForController()
     {
         $jsonController = new RestApiBundleTestJsonController();
@@ -86,7 +72,7 @@ class ControllerAnnotationReaderTest extends WebTestCase
 
     public function testInvalidAnnotation()
     {
-        $this->setExpectedException('InvalidArgumentException');
+        $this->setExpectedException('Doctrine\Common\Annotations\AnnotationException');
         $controller = new RestApiBundleTestNonApiController();
         $this->controllerAnnotationReader->getAnnotationForControllerAction($controller, 'invalidAnnotationAction');
     }

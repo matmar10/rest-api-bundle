@@ -4,6 +4,9 @@ use Symfony\Component\Config\Loader\LoaderInterface;
  
 class AppKernel extends Kernel
 {
+
+    protected static $cacheDirPrefix;
+
     public function registerBundles()
     {   
         return array(
@@ -23,8 +26,8 @@ class AppKernel extends Kernel
      * @return string
      */
     public function getCacheDir()
-    {   
-        return sys_get_temp_dir().'/Matmar10RestApiBundle/cache';
+    {
+        return __DIR__ . '/cache';
     }   
  
     /** 
@@ -32,6 +35,6 @@ class AppKernel extends Kernel
      */
     public function getLogDir()
     {   
-        return sys_get_temp_dir().'/Matmar10RestApiBundle/logs';
-    }   
+        return __DIR__ . '/logs';
+    }
 }

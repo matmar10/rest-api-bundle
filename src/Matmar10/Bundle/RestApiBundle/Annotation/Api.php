@@ -6,18 +6,20 @@ use InvalidArgumentException;
 
 /**
  * @Annotation
+ * @Target({"CLASS", "METHOD"})
  */
 class Api
 {
 
-    public $isApi = true;
-    public $statusCode = 200;
+    /**
+     * @var string
+     */
     public $serializeType = 'json';
 
-    public function getIsApi()
-    {
-        return $this->isApi;
-    }
+    /**
+     * @var int
+     */
+    public $statusCode = 200;
 
     public function getSerializeType()
     {
@@ -27,11 +29,6 @@ class Api
     public function getStatusCode()
     {
         return $this->statusCode;
-    }
-
-    public function setIsApi($isApi)
-    {
-        $this->isApi = $isApi;
     }
 
     public function setSerializeType($serializeType)

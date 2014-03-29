@@ -38,28 +38,28 @@ class ResponseFactoryTest extends WebTestCase
         $response1 = $this->factory->buildSuccessfulResponse('json', $entity);
         $this->assertEquals(200, $response1->getStatusCode());
         $this->assertEquals(
-            '{"success":true,"return":{"a":"A","b":1234,"c":false}}',
+            '{"a":"A","b":1234,"c":false}',
             $response1->getContent()
         );
 
-        $response2 = $this->factory->buildSuccessfulResponse('json', null);
+        $response2 = $this->factory->buildSuccessfulResponse('json', array());
         $this->assertEquals(200, $response2->getStatusCode());
         $this->assertEquals(
-            '{"success":true}',
+            '[]',
             $response2->getContent()
         );
 
         $response3 = $this->factory->buildSuccessfulResponse('json', true);
         $this->assertEquals(200, $response3->getStatusCode());
         $this->assertEquals(
-            '{"success":true,"return":true}',
+            'true',
             $response3->getContent()
         );
 
         $response4 = $this->factory->buildSuccessfulResponse('json', array(1,2,3));
         $this->assertEquals(200, $response4->getStatusCode());
         $this->assertEquals(
-            '{"success":true,"return":[1,2,3]}',
+            '[1,2,3]',
             $response4->getContent()
         );
 
@@ -73,7 +73,7 @@ class ResponseFactoryTest extends WebTestCase
         $response1 = $this->factory->buildExceptionResponse('json', $exception1);
         $this->assertEquals(400, $response1->getStatusCode());
         $this->assertEquals(
-            '{"success":false,"exception":{"message":"","code":0,"file":' . json_encode(__FILE__) . ',"line":' . (__LINE__ - $lineNumberDifference) . ',"error":"Matmar10\\\\Bundle\\\\RestApiBundle\\\\Exception\\\\ClientErrorRestApiException"}}',
+            '{"exception":{"message":"","code":0,"error":"Matmar10\\\\Bundle\\\\RestApiBundle\\\\Exception\\\\ClientErrorRestApiException"}}',
             $response1->getContent()
         );
     }
@@ -90,12 +90,9 @@ class ResponseFactoryTest extends WebTestCase
         $expectedXml1 = <<<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <result>
-  <success>true</success>
-  <return>
-    <a><![CDATA[A]]></a>
-    <b>1234</b>
-    <c>false</c>
-  </return>
+  <a><![CDATA[A]]></a>
+  <b>1234</b>
+  <c>false</c>
 </result>
 
 EOF;
@@ -105,9 +102,7 @@ EOF;
         $this->assertEquals(200, $response2->getStatusCode());
         $expectedXml2 = <<<EOF
 <?xml version="1.0" encoding="UTF-8"?>
-<result>
-  <success>true</success>
-</result>
+<result xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
 
 EOF;
         $this->assertEquals(
@@ -119,10 +114,7 @@ EOF;
         $this->assertEquals(200, $response3->getStatusCode());
         $expectedXml3 = <<<EOF
 <?xml version="1.0" encoding="UTF-8"?>
-<result>
-  <success>true</success>
-  <return>true</return>
-</result>
+<result>true</result>
 
 EOF;
         $this->assertEquals(
@@ -135,12 +127,9 @@ EOF;
         $expectedXml4 = <<<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <result>
-  <success>true</success>
-  <return>
-    <entry>1</entry>
-    <entry>2</entry>
-    <entry>3</entry>
-  </return>
+  <entry>1</entry>
+  <entry>2</entry>
+  <entry>3</entry>
 </result>
 
 EOF;
