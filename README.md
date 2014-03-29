@@ -33,7 +33,7 @@ Add the bundle to the Kernel and run composer update:
     {
         $bundles = array(
             ...
-            new Lmh\Bundle\RestApiBundle\LmhRestApiBundle(),
+            new Matmar10\Bundle\RestApiBundle\Matmar10RestApiBundle(),
         );
 
     }
@@ -47,7 +47,7 @@ Annotate a controller method; return value will automatically be serialized into
 
     namespace Acme\DemoBundle\Controller;
 
-    use Lmh\Bundle\RestApiBundle\Annotation\Api;
+    use Matmar10\Bundle\RestApiBundle\Annotation\Api;
     use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
     /**

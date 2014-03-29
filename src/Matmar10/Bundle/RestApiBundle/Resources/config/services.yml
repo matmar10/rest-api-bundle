@@ -1,0 +1,33 @@
+
+parameters:
+
+    matmar10_rest_api.response_factory.class:               Matmar10\Bundle\RestApiBundle\Service\ResponseFactory
+
+    matmar10_rest_api.controller_annotation_reader.class:   Matmar10\Bundle\RestApiBundle\Service\ControllerAnnotationReader
+
+    matmar10_rest_api.listener.view.class:                  Matmar10\Bundle\RestApiBundle\EventListener\Listener
+
+
+services:
+
+    matmar10_rest_api.response_factory:
+        class: %matmar10_rest_api.response_factory.class%
+        arguments: [ @serializer, @logger, "%kernel.debug%" ]
+        tags:
+            - { name: monolog.logger, channel: matmar10_rest_api.response_factory }
+
+    matmar10_rest_api.controller_annotation_reader:
+        class: %matmar10_rest_api.controller_annotation_reader.class%
+        arguments: [ @annotation_reader ] # wrap doctrine annotation reader
+
+    matmar10_rest_api.event_listener.view:
+        class: %matmar10_rest_api.listener.view.class%
+        arguments: [ @matmar10_rest_api.response_factory, @matmar10_rest_api.controller_annotation_reader, @logger ]
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
+            - { name: kernel.event_listener, event: kernel.view, method: onKernelView }
+            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
+            - { name: monolog.logger, channel: matmar10_rest_api.event_listener.view }
+
+
+
