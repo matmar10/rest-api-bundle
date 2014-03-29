@@ -99,10 +99,6 @@ class Listener
             return;
         }
 
-        if(!$annotation->getIsApi()) {
-            return;
-        }
-
         // construct serialized response from the exception that was raised
         $exception = $event->getException();
         $response = self::$apiResponseFactory->buildExceptionResponse($annotation->getSerializeType(), $exception);
