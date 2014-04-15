@@ -5,7 +5,7 @@ namespace Matmar10\Bundle\RestApiBundle\Exception;
 use Matmar10\Bundle\RestApiBundle\Exception\ClientErrorRestApiException;
 use Symfony\Component\Validator\ConstraintViolationList;
 
-class ValidatorErrorsRestApiException extends ClientErrorRestApiException  implements SerializableExceptionInterface
+class ValidatorErrorsException extends ClientErrorRestApiException  implements SerializableExceptionInterface
 {
 
     protected $validatorErrors;
