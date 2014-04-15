@@ -7,7 +7,7 @@ use JMS\Serializer\Annotation\Type;
 use JMS\Serializer\Annotation\ReadOnly;
 use JMS\Serializer\Annotation\SerializedName;
 use Matmar10\Bundle\RestApiBundle\Entity\RestApiExceptionEntity;
-use RestApi\Exception\ValidatorErrorsRestApiException;
+use Matmar10\Bundle\RestApiBundle\Exception\ValidatorErrorsRestApiException;
 
 /**
  * @ExclusionPolicy("none")

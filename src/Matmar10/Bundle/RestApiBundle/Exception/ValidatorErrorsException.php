@@ -28,6 +28,6 @@ class ValidatorErrorsRestApiException extends ClientErrorRestApiException  imple
 
     public function getSerializationEntityClassName()
     {
-        return '\RestApi\Entity\ValidatorErrorsRestApiExceptionEntity';
+        return 'RestApi\Entity\ValidatorErrorsRestApiExceptionEntity';
     }
 }
