@@ -28,6 +28,6 @@ class ValidatorErrorsException extends ClientErrorRestApiException  implements S
 
     public function getSerializationEntityClassName()
     {
-        return 'RestApi\Entity\ValidatorErrorsRestApiExceptionEntity';
+        return 'Matmar10\Bundle\RestApiBundle\Entity\ValidatorErrorsRestApiExceptionEntity';
     }
 }
