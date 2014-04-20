@@ -20,6 +20,6 @@ class RestApiException extends RuntimeException implements StatusCodeInterface, 
 
     public function getSerializationEntityClassName()
     {
-        return 'Matmar10\Bundle\RestApiBundle\Entity\RestApiExceptionEntity';
+        return 'Matmar10\Bundle\RestApiBundle\Entity\ExceptionEntity';
     }
 }

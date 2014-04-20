@@ -7,11 +7,13 @@ use JMS\Serializer\Annotation\ExclusionPolicy;
 use JMS\Serializer\Annotation\Groups;
 use JMS\Serializer\Annotation\Type;
 use JMS\Serializer\Annotation\ReadOnly;
+use Matmar10\Bundle\RestApiBundle\Entity\ExceptionEntityInterface;
 
 /**
  * @ExclusionPolicy("none")
  */
-class RestApiExceptionEntity {
+class ExceptionEntity implements ExceptionEntityInterface
+{
 
     /**
      * @Type("string")
@@ -48,9 +50,16 @@ class RestApiExceptionEntity {
      */
     protected $error;
 
-    public function __construct(\Exception $exception)
+    public function __construct(Exception $exception = null)
     {
-        $this->message = $exception->getMessage();        
+        if(!is_null($exception)) {
+            $this->setException($exception);
+        }
+    }
+
+    public function setException(Exception $exception)
+    {
+        $this->message = $exception->getMessage();
         $this->code = $exception->getCode();
         $this->file = $exception->getFile();
         $this->line = $exception->getLine();

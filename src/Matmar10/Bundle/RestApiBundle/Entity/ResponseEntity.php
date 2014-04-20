@@ -2,11 +2,13 @@
 
 namespace Matmar10\Bundle\RestApiBundle\Entity;
 
+use Exception;
 use JMS\Serializer\Annotation\AccessType;
 use JMS\Serializer\Annotation\ExclusionPolicy;
 use JMS\Serializer\Annotation\Groups;
 use JMS\Serializer\Annotation\ReadOnly;
 use JMS\Serializer\Annotation\Type;
+use Matmar10\Bundle\RestApiBundle\Entity\ExceptionEntityInterface;
 
 /**
  * @AccessType("public_method")
@@ -22,7 +24,7 @@ class ResponseEntity
      */
     protected $exception = null;
 
-    public function setException(RestApiExceptionEntity $exception)
+    public function setException(Exception $exception)
     {
         $this->exception = $exception;
     }
