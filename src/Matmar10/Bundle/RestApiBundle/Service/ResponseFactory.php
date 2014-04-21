@@ -20,20 +20,28 @@ class ResponseFactory
 
     protected $logger;
 
+    protected $groups = array('all');
     protected $contexts;
 
-    protected $defaultMapToExceptionClassName = 'Matmar10\Bundle\RestApiBundle\Entity\RestApiExceptionEntity';
+    protected $defaultMapToExceptionClassName;
 
-    protected $defaultExceptionStatusCode = 500;
+    protected $defaultExceptionStatusCode;
 
-    public function __construct(Serializer $serializer, Logger $logger, $debug = false)
+    public function __construct(
+            Serializer $serializer,
+            Logger $logger,
+            $debug,
+            $defaultExceptionEntity,
+            $defaultExceptionStatusCode)
     {
         $this->serializer = $serializer;
         $this->logger = $logger;
-        $this->contexts = array('all');
         if($debug) {
-            $this->contexts[] = 'debug';
+            $this->groups[] = 'debug';
         }
+        $this->defaultMapToExceptionClassName = $defaultExceptionEntity;
+        $this->defaultExceptionStatusCode = $defaultExceptionStatusCode;
+        $this->contexts = SerializationContext::create()->setGroups($this->groups);
     }
 
     /**
@@ -42,13 +50,13 @@ class ResponseFactory
      * @param string $serializeType How the entity should be serialized
      * @param mixed $content Content to be serialized
      * @param int $statusCode Http status code
-     * @param array $contexts Serialization context groups to be applied
+     * @param array $groups Serialization context groups to be applied
      * @return \Symfony\Component\HttpFoundation\Response The constructed response
      */
-    public function buildSuccessfulResponse($serializeType, $content, $statusCode = 200, $contexts = array())
+    public function buildSuccessfulResponse($serializeType, $content, $statusCode = 200, $groups = array())
     {
-        if(count($contexts)) {
-            $contexts = SerializationContext::create()->setGroups($this->contexts);
+        if(count($groups)) {
+            $contexts = SerializationContext::create()->setGroups($groups);
             $serializedContent = $this->serializer->serialize($content, $serializeType, $contexts);
         } else {
             $serializedContent = $this->serializer->serialize($content, $serializeType);
@@ -87,8 +95,7 @@ class ResponseFactory
          */
         $exceptionEntity = $reflectionObj->newInstance();
         $exceptionEntity->setException($exception);
-        $contexts = SerializationContext::create()->setGroups($this->contexts);
-        $serializedContent = $this->serializer->serialize($exceptionEntity, $serializeType, $contexts);
+        $serializedContent = $this->serializer->serialize($exceptionEntity, $serializeType, $this->contexts);
         return $this->buildResponse($serializeType, $serializedContent, $statusCode);
     }
 

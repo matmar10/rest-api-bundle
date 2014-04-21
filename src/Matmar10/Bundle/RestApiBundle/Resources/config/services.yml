@@ -1,18 +1,25 @@
 
 parameters:
 
-    matmar10_rest_api.response_factory.class:               Matmar10\Bundle\RestApiBundle\Service\ResponseFactory
+    matmar10_rest_api.response_factory.class:                Matmar10\Bundle\RestApiBundle\Service\ResponseFactory
 
-    matmar10_rest_api.controller_annotation_reader.class:   Matmar10\Bundle\RestApiBundle\Service\ControllerAnnotationReader
+    matmar10_rest_api.controller_annotation_reader.class:    Matmar10\Bundle\RestApiBundle\Service\ControllerAnnotationReader
 
-    matmar10_rest_api.listener.view.class:                  Matmar10\Bundle\RestApiBundle\EventListener\Listener
+    matmar10_rest_api.listener.view.class:                   Matmar10\Bundle\RestApiBundle\EventListener\Listener
 
-
+    matmar10_rest_api.default_exception_response_class:      Matmar10\Bundle\RestApiBundle\Entity\ExceptionEntity
+    matmar10_rest_api.default_exception_response_stats_code: 500
 services:
 
     matmar10_rest_api.response_factory:
         class: %matmar10_rest_api.response_factory.class%
-        arguments: [ @serializer, @logger, "%kernel.debug%" ]
+        arguments:
+            - @serializer
+            - @logger
+            - "%kernel.debug%"
+            - "%matmar10_rest_api.default_exception_response_class%"
+            - "%matmar10_rest_api.default_exception_response_stats_code%"
+
         tags:
             - { name: monolog.logger, channel: matmar10_rest_api.response_factory }
 
