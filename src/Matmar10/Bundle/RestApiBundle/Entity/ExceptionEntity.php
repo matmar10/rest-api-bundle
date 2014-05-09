@@ -50,6 +50,13 @@ class ExceptionEntity implements ExceptionEntityInterface
      */
     protected $error;
 
+    /**
+     * @Type("string")
+     * @Groups({"debug"})
+     * @ReadOnly
+     */
+    protected $trace;
+
     public function __construct(Exception $exception = null)
     {
         if(!is_null($exception)) {
@@ -64,6 +71,7 @@ class ExceptionEntity implements ExceptionEntityInterface
         $this->file = $exception->getFile();
         $this->line = $exception->getLine();
         $this->error = \get_class($exception);
+        $this->trace = $exception->getTraceAsString();
     }
 
 }
