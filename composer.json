@@ -1,6 +1,6 @@
 {
     "name": "matmar10/rest-api-bundle",
-    "version": "0.2.0",
+    "version": "0.3.2",
     "description": "A Symfony Bundle that enables the use of @Api annotation to automatically serialize any return value from any controller using JMS Serializer.",
     "keywords": ["rest", "rest api", "jms", "jms serializer bundle", "xml", "json", "symfony", "symfony bundle", "marshaling", "controller", "annotation"],
     "type": "symfony-bundle",

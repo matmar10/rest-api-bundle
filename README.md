@@ -17,8 +17,7 @@ Add to your Symfony project composer file:
 
  ```javascript
     "require": {
-        ...
-        "lmh/rest-api-bundle": "dev-master"
+        "matmar10/rest-api-bundle": "~0.3.2"
     },
     ...
 
