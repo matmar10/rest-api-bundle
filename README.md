@@ -91,7 +91,7 @@ The value of the @Api annotation indicates the serialization type:
         return $person;
     }
 
-// results in: {"result":"success","return":{"name":"Matthew J. Martin","age":28}}
+// results in: {"name":"Matthew J. Martin","age":28}
 
 ```
 
