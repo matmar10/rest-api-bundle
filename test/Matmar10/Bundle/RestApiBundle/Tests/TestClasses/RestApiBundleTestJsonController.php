@@ -39,6 +39,6 @@ class RestApiBundleTestJsonController extends Controller
 
     public function exceptionAction()
     {
-        throw new Exception("example exception");
+        throw new Exception('example exception');
     }
 }

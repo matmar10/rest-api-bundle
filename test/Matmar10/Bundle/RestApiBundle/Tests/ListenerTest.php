@@ -155,7 +155,6 @@ class ListenerTest extends WebTestCase
     /**
      * @dataProvider failureDataProvider
      */
-    /*
     public function testFailure($request, $method, $controller, $action, $expectedIsApi, $expectedSerializeType, $expectedStatusCode, $expectedExceptionParams)
     {
         $request->setMethod($method);
@@ -169,12 +168,13 @@ class ListenerTest extends WebTestCase
 
         $this->listener->onKernelController($event);
 
+        $isApi = $event->getRequest()->attributes->get('_is_api');
+        $this->assertEquals($expectedIsApi, $isApi);
+
         $annotation = $event->getRequest()->attributes->get('_api_controller_metadata');
         $this->assertInstanceOf('Matmar10\Bundle\RestApiBundle\Annotation\Api', $annotation);
-        $this->assertEquals($expectedIsApi, $annotation->getIsApi());
 
         if($expectedIsApi) {
-            $this->assertEquals($expectedSerializeType, $annotation->getSerializeType());
             $this->assertEquals($expectedStatusCode, $annotation->getStatusCode());
         }
 
@@ -194,19 +194,25 @@ class ListenerTest extends WebTestCase
         $response = $event->getResponse();
         $responseContent = $response->getContent();
 
-        if('json' === $expectedSerializeType) {
-            $responseData = json_decode($responseContent, true);
-            foreach($expectedExceptionParams as $name => $param) {
-                $this->assertEquals($param, $responseData['exception'][$name]);
-            }
-            return;
+        switch($expectedSerializeType) {
+            case 'json':
+                $responseData = json_decode($responseContent, true);
+                break;
+
+            case 'xml':
+                $responseData = \simplexml_load_string($responseContent);
+                break;
+
+            default:
+                $this->fail(sprintf('Unexpected serialize type %s for test case', $expectedSerializeType));
+                return;
         }
 
-        $responseData = \simplexml_load_string($responseContent);
         foreach($expectedExceptionParams as $name => $param) {
-            $this->assertEquals($param, $responseData['exception'][$name]);
+            $this->assertEquals($param, $responseData[$name]);
         }
-    }*/
+
+    }
 
     public function failureDataProvider()
     {
@@ -220,23 +226,9 @@ class ListenerTest extends WebTestCase
                 'json',
                 202,
                 array(
-                    "message" => "example exception",
-                    "code" => 0,
-                    "error" => "Exception",
-                ),
-            ),
-            'GET exceptionActionAsXmlAction' => array(
-                new Request(array(), array(), array(), array(), array(), array(), array()),
-                'GET',
-                new RestApiBundleTestJsonController(),
-                'exceptionActionAsXmlAction',
-                true,
-                'xml',
-                200,
-                array(
-                    "message" => "example exception",
-                    "code" => 0,
-                    "error" => "Exception",
+                    'message' => 'example exception',
+                    'code' => 0,
+                    'error' => 'Exception',
                 ),
             ),
         );

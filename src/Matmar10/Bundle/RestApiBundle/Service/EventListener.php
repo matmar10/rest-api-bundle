@@ -104,7 +104,7 @@ class EventListener
 
         // construct a serialized version of the exception
         $annotation = $request->attributes->get('_api_controller_metadata');
-        $response = $this->apiResponseFactory->buildExceptionResponse($request, $annotation);
+        $response = $this->apiResponseFactory->buildExceptionResponse($request, $annotation, $event->getException());
 
         // set the exception response on the event object
         $event->setResponse($response);
