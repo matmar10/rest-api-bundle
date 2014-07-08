@@ -2,14 +2,20 @@
 
 namespace Matmar10\Bundle\RestApiBundle\Tests;
 
+use Matmar10\Bundle\RestApiBundle\Annotation\Api;
 use Matmar10\Bundle\RestApiBundle\Exception\ClientErrorRestApiException;
 use Matmar10\Bundle\RestApiBundle\Service\ResponseFactory;
+use Matmar10\Bundle\RestApiBundle\Service\TypeNegotiator;
 use Matmar10\Bundle\RestApiBundle\Tests\TestClasses\RestApiBundleTestClass;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Request;
 
 class ResponseFactoryTest extends WebTestCase
 {
 
+    /**
+     * @var \Matmar10\Bundle\RestApiBundle\Service\ResponseFactory
+     */
     protected $factory;
 
     private function getKernel()
@@ -23,48 +29,71 @@ class ResponseFactoryTest extends WebTestCase
     public function setUp()
     {
         $container = $this->getKernel()->getContainer();
-        $serializer = $container->get('jms_serializer');
-        $logger = $container->get('logger');
-        $this->factory = new ResponseFactory($serializer, $logger);
+        $this->factory = $container->get('matmar10_rest_api.response_factory');
     }
 
-    public function testBuildSuccessfulJsonResponse()
+    /**
+     * @dataProvider provideTestBuildSuccessfulJsonResponseData
+     */
+    public function testBuildSuccessfulJsonResponse(Request $request, $annotationProperties, $content, $expectedStatusCode, $expectedSerializedContent)
     {
+        $annotationObj = new Api();
+        foreach($annotationProperties as $key => $value) {
+            $annotationObj->$key = $value;
+        }
+
+        $response = $this->factory->buildSuccessfulResponse($request, $annotationObj, $content);
+        $this->assertEquals($expectedStatusCode, $response->getStatusCode());
+        $this->assertEquals($expectedSerializedContent, $response->getContent());
+    }
+
+    public function provideTestBuildSuccessfulJsonResponseData()
+    {
+
         $entity = new RestApiBundleTestClass();
         $entity->setA('A');
         $entity->setB(1234);
         $entity->setC(false);
 
-        $response1 = $this->factory->buildSuccessfulResponse('json', $entity);
-        $this->assertEquals(200, $response1->getStatusCode());
-        $this->assertEquals(
-            '{"a":"A","b":1234,"c":false}',
-            $response1->getContent()
+        return array(
+            array(
+                new Request(array(), array(), array(), array(), array(), array(), array()),
+                array(),
+                $entity,
+                200,
+                '{"a":"A","b":1234,"c":false}',
+            ),
+            array(
+                new Request(array(), array(), array(), array(), array(), array(), array()),
+                array(),
+                array(),
+                200,
+                '[]',
+            ),
+            array(
+                new Request(array(), array(), array(), array(), array(), array(), array()),
+                array(),
+                true,
+                200,
+                'true',
+            ),
+            array(
+                new Request(array(), array(), array(), array(), array(), array(), array()),
+                array(),
+                array(1,2,3),
+                200,
+                '[1,2,3]',
+            ),
+            array(
+                new Request(array(), array(), array(), array(), array(), array(), array()),
+                array('statusCode' => 201),
+                array(1,2,3),
+                201,
+                '[1,2,3]',
+            ),
         );
-
-        $response2 = $this->factory->buildSuccessfulResponse('json', array());
-        $this->assertEquals(200, $response2->getStatusCode());
-        $this->assertEquals(
-            '[]',
-            $response2->getContent()
-        );
-
-        $response3 = $this->factory->buildSuccessfulResponse('json', true);
-        $this->assertEquals(200, $response3->getStatusCode());
-        $this->assertEquals(
-            'true',
-            $response3->getContent()
-        );
-
-        $response4 = $this->factory->buildSuccessfulResponse('json', array(1,2,3));
-        $this->assertEquals(200, $response4->getStatusCode());
-        $this->assertEquals(
-            '[1,2,3]',
-            $response4->getContent()
-        );
-
     }
-
+/*
     public function testBuildExceptionJsonResponse()
     {
         // NOTE: the following is line number dependent; adding spaces will require adjustment of the line difference
@@ -139,4 +168,5 @@ EOF;
         );
 
     }
+*/
 }

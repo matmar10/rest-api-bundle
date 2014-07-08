@@ -3,7 +3,7 @@
 namespace Matmar10\Bundle\RestApiBundle\Tests;
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
-use Matmar10\Bundle\RestApiBundle\Service\ControllerAnnotationReader;
+use Matmar10\Bundle\RestApiBundle\Service\AnnotationReader;
 use Matmar10\Bundle\RestApiBundle\Tests\TestClasses\RestApiBundleTestJsonController;
 use Matmar10\Bundle\RestApiBundle\Tests\TestClasses\RestApiBundleTestXmlController;
 use Matmar10\Bundle\RestApiBundle\Tests\TestClasses\RestApiBundleTestNonApiController;
@@ -27,27 +27,7 @@ class ControllerAnnotationReaderTest extends WebTestCase
         AnnotationRegistry::registerAutoloadNamespace('Matmar10\\Bundle\\RestApiBundle\\Annotation', __DIR__.'/../../../../../src');
         $container = $this->getKernel()->getContainer();
         $annotationReader = $container->get('annotation_reader');
-        $this->controllerAnnotationReader = new ControllerAnnotationReader($annotationReader);
-    }
-
-    public function testGetSerializeTypeForController()
-    {
-        $jsonController = new RestApiBundleTestJsonController();
-        $this->assertEquals('json', $this->controllerAnnotationReader->getAnnotationForController($jsonController)->getSerializeType());
-
-        $xmlController = new RestApiBundleTestXmlController();
-        $this->assertEquals('xml', $this->controllerAnnotationReader->getAnnotationForController($xmlController)->getSerializeType());
-    }
-
-    public function testGetSerializeTypeForControllerAction()
-    {
-        $jsonController = new RestApiBundleTestJsonController();
-        $this->assertEquals('json', $this->controllerAnnotationReader->getAnnotationForControllerAction($jsonController, 'getObjectAsJsonAction')->getSerializeType());
-        $this->assertEquals('xml', $this->controllerAnnotationReader->getAnnotationForControllerAction($jsonController, 'getStringAsXmlAction')->getSerializeType(), 'test action level serialize type override');
-
-        $xmlController = new RestApiBundleTestXmlController();
-        $this->assertEquals('xml', $this->controllerAnnotationReader->getAnnotationForControllerAction($xmlController, 'getObjectAsXmlAction')->getSerializeType());
-        $this->assertEquals('json', $this->controllerAnnotationReader->getAnnotationForControllerAction($xmlController, 'getStringAsJsonAction')->getSerializeType(), 'test action level serialize type override');
+        $this->controllerAnnotationReader = new AnnotationReader($annotationReader);
     }
 
     public function testGetStatusCodeForController()
@@ -63,11 +43,9 @@ class ControllerAnnotationReaderTest extends WebTestCase
     {
         $jsonController = new RestApiBundleTestJsonController();
         $this->assertEquals(202, $this->controllerAnnotationReader->getAnnotationForControllerAction($jsonController, 'getObjectAsJsonAction')->getStatusCode());
-        $this->assertEquals(201, $this->controllerAnnotationReader->getAnnotationForControllerAction($jsonController, 'getStringAsXmlAction')->getStatusCode(), 'test action level status code override');
 
         $xmlController = new RestApiBundleTestXmlController();
         $this->assertEquals(202, $this->controllerAnnotationReader->getAnnotationForControllerAction($xmlController, 'getObjectAsXmlAction')->getStatusCode());
-        $this->assertEquals(201, $this->controllerAnnotationReader->getAnnotationForControllerAction($xmlController, 'getStringAsJsonAction')->getStatusCode(), 'test action level status code override');
     }
 
     public function testInvalidAnnotation()

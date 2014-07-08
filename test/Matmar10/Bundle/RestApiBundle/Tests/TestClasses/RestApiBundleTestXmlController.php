@@ -36,12 +36,4 @@ class RestApiBundleTestXmlController extends Controller
     {
         return null;
     }
-
-    /**
-     * @Api("json", statusCode=201)
-     */
-    public function getStringAsJsonAction()
-    {
-        return "abcdef12345";
-    }
 }

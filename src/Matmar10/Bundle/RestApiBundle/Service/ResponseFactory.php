@@ -5,75 +5,100 @@ namespace Matmar10\Bundle\RestApiBundle\Service;
 use Exception;
 use JMS\Serializer\Serializer;
 use JMS\Serializer\SerializationContext;
+use Matmar10\Bundle\RestApiBundle\Annotation\Api;
 use Matmar10\Bundle\RestApiBundle\Entity\ResponseEntity;
 use Matmar10\Bundle\RestApiBundle\Exception\SerializableExceptionInterface;
+use Matmar10\Bundle\RestApiBundle\Service\TypeNegotiator;
 use ReflectionClass;
 use Symfony\Bridge\Monolog\Logger;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class ResponseFactory
 {
-    const SERIALIZE_TYPE_JSON = 'json';
-    const SERIALIZE_TYPE_XML = 'XML';
 
+    /**
+     * @var \Matmar10\Bundle\RestApiBundle\Service\TypeNegotiator
+     */
+    protected $typeNegotiator;
+
+    /**
+     * @var \JMS\Serializer\Serializer
+     */
     protected $serializer;
 
+    /**
+     * @var \Symfony\Bridge\Monolog\Logger
+     */
     protected $logger;
 
-    protected $groups = array('all');
-    protected $contexts;
-
+    /**
+     * @var string
+     */
     protected $defaultMapToExceptionClassName;
 
+    /**
+     * @var integer
+     */
+    protected $defaultSuccessStatusCode;
+
+    /**
+     * @var integer
+     */
     protected $defaultExceptionStatusCode;
 
+    /**
+     * @var array<string>
+     */
+    protected $defaultSerializeGroups;
+
     public function __construct(
-            Serializer $serializer,
-            Logger $logger,
-            $debug,
-            $defaultExceptionEntity,
-            $defaultExceptionStatusCode)
+        TypeNegotiator $typeNegotiator,
+        Serializer $serializer,
+        Logger $logger,
+        $defaultExceptionEntity,
+        $defaultSuccessStatusCode,
+        $defaultExceptionStatusCode,
+        $defaultSerializeGroups
+    )
     {
+        $this->typeNegotiator = $typeNegotiator;
         $this->serializer = $serializer;
         $this->logger = $logger;
-        if($debug) {
-            $this->groups[] = 'debug';
-        }
         $this->defaultMapToExceptionClassName = $defaultExceptionEntity;
+        $this->defaultSuccessStatusCode = $defaultSuccessStatusCode;
         $this->defaultExceptionStatusCode = $defaultExceptionStatusCode;
-        $this->contexts = SerializationContext::create()->setGroups($this->groups);
+        $this->defaultSerializeGroups = $defaultSerializeGroups;
     }
 
-    /**
-     * Builds a successful serialized response from the specified content
-     *
-     * @param string $serializeType How the entity should be serialized
-     * @param mixed $content Content to be serialized
-     * @param int $statusCode Http status code
-     * @param array $groups Serialization context groups to be applied
-     * @return \Symfony\Component\HttpFoundation\Response The constructed response
-     */
-    public function buildSuccessfulResponse($serializeType, $content, $statusCode = 200, $groups = array())
+    public function buildSuccessfulResponse(Request $request, Api $annotation, $content)
     {
-        if(count($groups)) {
-            $contexts = SerializationContext::create()->setGroups($groups);
-            $serializedContent = $this->serializer->serialize($content, $serializeType, $contexts);
-        } else {
-            $serializedContent = $this->serializer->serialize($content, $serializeType);
+
+        if(is_null($annotation->statusCode)) {
+            $annotation->statusCode = $this->defaultSuccessStatusCode;
         }
 
-        return $this->buildResponse($serializeType, $serializedContent, $statusCode);
+        // only use groups if they are specified so that everything is serialized by default
+        $context = SerializationContext::create();
+        if(!is_null($annotation->groups)) {
+            $context->setGroups($annotation->groups);
+        }
+
+        $serializeType = $this->typeNegotiator->getSerializeType($request);
+        $serializedContent = $this->serializer->serialize($content, $serializeType, $context);
+        $contentType = $this->typeNegotiator->getContentType($serializeType);
+
+        $response = new Response();
+        $response->headers->set('Content-Type', $contentType);
+        $response->setContent($serializedContent);
+        $response->setStatusCode($annotation->statusCode);
+        return $response;
     }
 
-    /**
-     * Builds a serialized response from an exception
-     *
-     * @param string $serializeType How the entity should be serialized
-     * @param \Exception $exception The exception that was raised
-     * @return \Symfony\Component\HttpFoundation\Response The constructed response
-     */
-    public function buildExceptionResponse($serializeType, Exception $exception)
+    public function buildExceptionResponse(Request $request, Api $annotation, Exception $exception)
     {
+
+        $serializeType = $this->typeNegotiator->getSerializeType($request);
 
         if($exception instanceof SerializableExceptionInterface) {
             /**
@@ -95,17 +120,24 @@ class ResponseFactory
          */
         $exceptionEntity = $reflectionObj->newInstance();
         $exceptionEntity->setException($exception);
-        $serializedContent = $this->serializer->serialize($exceptionEntity, $serializeType, $this->contexts);
-        return $this->buildResponse($serializeType, $serializedContent, $statusCode);
-    }
 
-    // TODO: use Symfony content type mappings to allow much more flexible serialization doing anything JMS Serializer supports
-    protected function buildResponse($serializeType, $content, $statusCode)
-    {
+
+        // use groups if they are specified, otherwise use defaults
+        $context = SerializationContext::create();
+        if(is_null($annotation->groups)) {
+            $context->setGroups($this->defaultSerializeGroups);
+        } else {
+            $context->setGroups($annotation->groups);
+        }
+
+        $serializedContent = $this->serializer->serialize($exceptionEntity, $serializeType, $context);
+        $contentType = $this->typeNegotiator->getContentType($serializeType);
+
         $response = new Response();
-        $response->headers->set('Content-Type', "application/$serializeType");
-        $response->setContent($content);
+        $response->headers->set('Content-Type', $contentType);
+        $response->setContent($serializedContent);
         $response->setStatusCode($statusCode);
         return $response;
     }
+
 }

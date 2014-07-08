@@ -1,35 +1,52 @@
 
 parameters:
 
-    matmar10_rest_api.response_factory.class:                Matmar10\Bundle\RestApiBundle\Service\ResponseFactory
+    matmar10_rest_api.response_factory.class:                 Matmar10\Bundle\RestApiBundle\Service\ResponseFactory
 
-    matmar10_rest_api.controller_annotation_reader.class:    Matmar10\Bundle\RestApiBundle\Service\ControllerAnnotationReader
+    matmar10_rest_api.type_negotiator.class:                  Matmar10\Bundle\RestApiBundle\Service\TypeNegotiator
 
-    matmar10_rest_api.listener.view.class:                   Matmar10\Bundle\RestApiBundle\EventListener\Listener
+    matmar10_rest_api.annotation_reader.class:                Matmar10\Bundle\RestApiBundle\Service\AnnotationReader
 
-    matmar10_rest_api.default_exception_response_class:      Matmar10\Bundle\RestApiBundle\Entity\ExceptionEntity
-    matmar10_rest_api.default_exception_response_stats_code: 500
+    matmar10_rest_api.event_listener.class:                   Matmar10\Bundle\RestApiBundle\Service\EventListener
+
+    matmar10_rest_api.default_exception_response_class:       Matmar10\Bundle\RestApiBundle\Entity\ExceptionEntity
+
+    matmar10_rest_api.default_content_types:
+        json:       application/json
+        xml:        application/xml
+        yaml:       text/x-yaml
+
 services:
 
     matmar10_rest_api.response_factory:
-        class: %matmar10_rest_api.response_factory.class%
+        class: "%matmar10_rest_api.response_factory.class%"
         arguments:
+            - @matmar10_rest_api.type_negotiator
             - @serializer
             - @logger
-            - "%kernel.debug%"
             - "%matmar10_rest_api.default_exception_response_class%"
-            - "%matmar10_rest_api.default_exception_response_stats_code%"
-
+            - "%matmar10_rest_api.default_success_status_code%"
+            - "%matmar10_rest_api.default_exception_status_code%"
+            - "%matmar10_rest_api.default_serialize_groups%"
         tags:
             - { name: monolog.logger, channel: matmar10_rest_api.response_factory }
 
-    matmar10_rest_api.controller_annotation_reader:
-        class: %matmar10_rest_api.controller_annotation_reader.class%
+    matmar10_rest_api.type_negotiator:
+        class: "%matmar10_rest_api.type_negotiator.class%"
+        arguments:
+            - "%matmar10_rest_api.content_types%"
+            - "%matmar10_rest_api.default_serialize_type%"
+
+    matmar10_rest_api.annotation_reader:
+        class: "%matmar10_rest_api.annotation_reader.class%"
         arguments: [ @annotation_reader ] # wrap doctrine annotation reader
 
-    matmar10_rest_api.event_listener.view:
-        class: %matmar10_rest_api.listener.view.class%
-        arguments: [ @matmar10_rest_api.response_factory, @matmar10_rest_api.controller_annotation_reader, @logger ]
+    matmar10_rest_api.event_listener.class:
+        class: "%matmar10_rest_api.event_listener.class%"
+        arguments:
+            - @matmar10_rest_api.response_factory
+            - @matmar10_rest_api.annotation_reader
+            - @logger
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
             - { name: kernel.event_listener, event: kernel.view, method: onKernelView }

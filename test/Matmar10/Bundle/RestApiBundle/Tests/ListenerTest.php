@@ -3,7 +3,7 @@
 namespace Matmar10\Bundle\RestApiBundle\Tests;
 
 use Exception;
-use Matmar10\Bundle\RestApiBundle\EventListener\Listener;
+use Matmar10\Bundle\RestApiBundle\Service\EventListener;
 use Matmar10\Bundle\RestApiBundle\Tests\TestClasses\RestApiBundleTestJsonController;
 use Matmar10\Bundle\RestApiBundle\Tests\TestClasses\RestApiBundleTestXmlController;
 use PHPUnit_Framework_TestCase;
@@ -26,9 +26,9 @@ class ListenerTest extends WebTestCase
         static::$kernel->boot();
         $container = static::$kernel->getContainer();
         $responseFactory = $container->get('matmar10_rest_api.response_factory');
-        $annotationReader = $container->get('matmar10_rest_api.controller_annotation_reader');
+        $annotationReader = $container->get('matmar10_rest_api.annotation_reader');
         $logger = $container->get('logger');
-        $this->listener = new Listener($responseFactory, $annotationReader, $logger);
+        $this->listener = new EventListener($responseFactory, $annotationReader, $logger);
     }
 
     /**
@@ -47,11 +47,12 @@ class ListenerTest extends WebTestCase
 
         $this->listener->onKernelController($event);
 
+        $isApi = $event->getRequest()->attributes->get('_is_api');
         $annotation = $event->getRequest()->attributes->get('_api_controller_metadata');
         $this->assertInstanceOf('Matmar10\Bundle\RestApiBundle\Annotation\Api', $annotation);
 
         if($expectedIsApi) {
-            $this->assertEquals($expectedSerializeType, $annotation->getSerializeType());
+            $this->assertEquals(true, $isApi);
             $this->assertEquals($expectedStatusCode, $annotation->getStatusCode());
         }
 
@@ -108,20 +109,8 @@ class ListenerTest extends WebTestCase
                 202,
                 'null',
             ),
-            'GET getStringAsXmlAction' => array(
-                new Request(array(), array(), array(), array(), array(), array(), array()),
-                'GET',
-                new RestApiBundleTestJsonController(),
-                'getStringAsXmlAction',
-                true,
-                'xml',
-                201,
-                '<?xml version="1.0" encoding="UTF-8"?>
-<result><![CDATA[abcdef12345]]></result>
-',
-            ),
             'GET getObjectAsXmlAction' => array(
-                new Request(array(), array(), array(), array(), array(), array(), array()),
+                new Request(array(), array(), array(), array(), array(), array('HTTP_ACCEPT' => 'application/xml'), array()),
                 'GET',
                 new RestApiBundleTestXmlController(),
                 'getObjectAsXmlAction',
@@ -137,7 +126,7 @@ class ListenerTest extends WebTestCase
 ',
             ),
             'GET getBooleanAsXmlAction' => array(
-                new Request(array(), array(), array(), array(), array(), array(), array()),
+                new Request(array(), array(), array(), array(), array(), array('HTTP_ACCEPT' => 'application/xml'), array()),
                 'GET',
                 new RestApiBundleTestXmlController(),
                 'getBooleanAsXmlAction',
@@ -148,7 +137,7 @@ class ListenerTest extends WebTestCase
 <result>true</result>
 ',
             'GET getNullAsXmlAction' => array(
-                new Request(array(), array(), array(), array(), array(), array(), array()),
+                new Request(array(), array(), array(), array(), array(), array('HTTP_ACCEPT' => 'application/xml'), array()),
                 'GET',
                 new RestApiBundleTestXmlController(),
                 'getNullAsXmlAction',
@@ -157,18 +146,6 @@ class ListenerTest extends WebTestCase
                 202,
                 '<?xml version="1.0" encoding="UTF-8"?>
 <result></result>
-',
-            ),
-            'GET getStringAsJsonAction' => array(
-                new Request(array(), array(), array(), array(), array(), array(), array()),
-                'GET',
-                new RestApiBundleTestXmlController(),
-                'getNullAsXmlAction',
-                true,
-                'json',
-                201,
-                '<?xml version="1.0" encoding="UTF-8"?>
-<result>true</result>
 ',
                 ),
             ),

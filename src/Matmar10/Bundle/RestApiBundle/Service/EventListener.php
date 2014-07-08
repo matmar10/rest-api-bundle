@@ -1,29 +1,34 @@
 <?php
 
-namespace Matmar10\Bundle\RestApiBundle\EventListener;
+namespace Matmar10\Bundle\RestApiBundle\Service;
 
-use Matmar10\Bundle\RestApiBundle\Service\ControllerAnnotationReader;
+use JMS\Serializer\SerializationContext;
+use Matmar10\Bundle\RestApiBundle\Annotation\Api;
+use Matmar10\Bundle\RestApiBundle\Service\AnnotationReader;
 use Matmar10\Bundle\RestApiBundle\Service\ResponseFactory;
 use Symfony\Bridge\Monolog\Logger;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 
-class Listener
+class EventListener
 {
-    const DEFAULT_RESPONSE_CODE = 200;
 
-    protected static $apiResponseFactory;
+    protected $apiResponseFactory;
 
-    protected static $controllerAnnotationReader;
+    protected $controllerAnnotationReader;
 
-    protected static $logger;
+    protected $logger;
 
-    public function __construct(ResponseFactory $apiResponseFactory, ControllerAnnotationReader $controllerAnnotationReader, Logger $logger)
+    public function __construct(
+        ResponseFactory $apiResponseFactory,
+        AnnotationReader $controllerAnnotationReader,
+        Logger $logger
+    )
     {
-        self::$apiResponseFactory = $apiResponseFactory;
-        self::$controllerAnnotationReader = $controllerAnnotationReader;
-        self::$logger = $logger;
+        $this->apiResponseFactory = $apiResponseFactory;
+        $this->controllerAnnotationReader = $controllerAnnotationReader;
+        $this->logger = $logger;
     }
 
     /**
@@ -41,7 +46,7 @@ class Listener
         list($controller, $actionName) = $controllerMetadata;
 
         // read annotation for invoked controller action
-        $annotation = self::$controllerAnnotationReader->getAnnotationForControllerAction($controller, $actionName);
+        $annotation = $this->controllerAnnotationReader->getAnnotationForControllerAction($controller, $actionName);
 
         if(!$annotation) {
             return;
@@ -49,6 +54,7 @@ class Listener
 
         // set the annotation as metadata to be used in the kernel view event
         $request = $event->getRequest();
+        $request->attributes->set('_is_api', true);
         $request->attributes->set('_api_controller_metadata', $annotation);
     }
 
@@ -59,24 +65,23 @@ class Listener
      */
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
-        self::$logger->addDebug('checking controller result for serialization type');
+        $this->logger->addDebug('checking controller result for serialization type');
 
         $request = $event->getRequest();
-        $annotation = $request->attributes->get('_api_controller_metadata');
-
-        // ignore if no API annotation present
-        if(!$annotation) {
+        $isApi = $request->attributes->get('_is_api');
+        if(!$isApi) {
             return;
         }
 
-        $serializeType = $annotation->getSerializeType();
-        $statusCode = $annotation->getStatusCode();
-
-        self::$logger->addDebug("controller requires serialization into $serializeType with response code $statusCode");
+        /* @var $annotation \Matmar10\Bundle\RestApiBundle\Annotation\Api */
+        $annotation = $request->attributes->get('_api_controller_metadata');
+        if(!$annotation) {
+            $annotation = new Api();
+        }
 
         // construct serialized response from controllers result
         $controllerResult = $event->getControllerResult();
-        $response = self::$apiResponseFactory->buildSuccessfulResponse($serializeType, $controllerResult, $statusCode);
+        $response = $this->apiResponseFactory->buildSuccessfulResponse($request, $annotation, $controllerResult);
 
         // set the response on the event object
         $event->setResponse($response);
@@ -89,19 +94,17 @@ class Listener
      */
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
-        self::$logger->addDebug('checking if exception was thrown by an API controller');
+        $this->logger->addDebug('checking if exception was thrown by an API controller');
 
         $request = $event->getRequest();
-        $annotation = $request->attributes->get('_api_controller_metadata');
-
-        // ignore if no API annotation present
-        if(!$annotation) {
+        $isApi = $request->attributes->get('_is_api');
+        if(!$isApi) {
             return;
         }
 
-        // construct serialized response from the exception that was raised
-        $exception = $event->getException();
-        $response = self::$apiResponseFactory->buildExceptionResponse($annotation->getSerializeType(), $exception);
+        // construct a serialized version of the exception
+        $annotation = $request->attributes->get('_api_controller_metadata');
+        $response = $this->apiResponseFactory->buildExceptionResponse($request, $annotation);
 
         // set the exception response on the event object
         $event->setResponse($response);

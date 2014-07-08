@@ -12,28 +12,18 @@ class Api
 {
 
     /**
-     * @var string
-     */
-    public $serializeType = 'json';
-
-    /**
      * @var int
      */
-    public $statusCode = 200;
+    public $statusCode = null;
 
-    public function getSerializeType()
-    {
-        return $this->serializeType;
-    }
+    /**
+     * @var array
+     */
+    public $groups = null;
 
     public function getStatusCode()
     {
         return $this->statusCode;
-    }
-
-    public function setSerializeType($serializeType)
-    {
-        $this->serializeType = $serializeType;
     }
 
     public function setStatusCode($statusCode)

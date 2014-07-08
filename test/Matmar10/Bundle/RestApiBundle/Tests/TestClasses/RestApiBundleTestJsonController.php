@@ -8,7 +8,7 @@ use Matmar10\Bundle\RestApiBundle\Tests\TestClasses\RestApiBundleTestClass;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 /**
- * @Api("json", statusCode=202)
+ * @Api(statusCode=202)
  */
 class RestApiBundleTestJsonController extends Controller
 {
@@ -37,23 +37,7 @@ class RestApiBundleTestJsonController extends Controller
         return null;
     }
 
-    /**
-     * @Api("xml", statusCode=201)
-     */
-    public function getStringAsXmlAction()
-    {
-        return "abcdef12345";
-    }
-
     public function exceptionAction()
-    {
-        throw new Exception("example exception");
-    }
-
-    /**
-     * @Api("xml")
-     */
-    public function exceptionActionAsXmlAction()
     {
         throw new Exception("example exception");
     }

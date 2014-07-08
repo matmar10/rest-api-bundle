@@ -7,7 +7,7 @@ use LogicException;
 use ReflectionObject;
 use ReflectionMethod;
 
-class ControllerAnnotationReader
+class AnnotationReader
 {
 
     protected $reader;
