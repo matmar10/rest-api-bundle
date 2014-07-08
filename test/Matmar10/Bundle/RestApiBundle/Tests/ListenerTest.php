@@ -197,19 +197,21 @@ class ListenerTest extends WebTestCase
         switch($expectedSerializeType) {
             case 'json':
                 $responseData = json_decode($responseContent, true);
+                foreach($expectedExceptionParams as $name => $param) {
+                    $this->assertEquals($param, $responseData[$name]);
+                }
                 break;
 
             case 'xml':
                 $responseData = \simplexml_load_string($responseContent);
+                foreach($expectedExceptionParams as $name => $param) {
+                    $this->assertEquals($param, (string)$responseData->$name);
+                }
                 break;
 
             default:
                 $this->fail(sprintf('Unexpected serialize type %s for test case', $expectedSerializeType));
                 return;
-        }
-
-        foreach($expectedExceptionParams as $name => $param) {
-            $this->assertEquals($param, $responseData[$name]);
         }
 
     }
@@ -224,6 +226,21 @@ class ListenerTest extends WebTestCase
                 'exceptionAction',
                 true,
                 'json',
+                202,
+                array(
+                    'message' => 'example exception',
+                    'code' => 0,
+                    'error' => 'Exception',
+                ),
+            ),
+
+            'GET exceptionAction XML' => array(
+                new Request(array(), array(), array(), array(), array(), array('HTTP_ACCEPT' => 'application/xml'), array()),
+                'GET',
+                new RestApiBundleTestJsonController(),
+                'exceptionAction',
+                true,
+                'xml',
                 202,
                 array(
                     'message' => 'example exception',
