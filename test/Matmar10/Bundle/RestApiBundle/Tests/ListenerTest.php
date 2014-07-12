@@ -230,7 +230,7 @@ class ListenerTest extends WebTestCase
                 array(
                     'message' => 'example exception',
                     'code' => 0,
-                    'error' => 'Exception',
+                    'class' => 'Exception',
                 ),
             ),
 
@@ -245,7 +245,7 @@ class ListenerTest extends WebTestCase
                 array(
                     'message' => 'example exception',
                     'code' => 0,
-                    'error' => 'Exception',
+                    'class' => 'Exception',
                 ),
             ),
         );

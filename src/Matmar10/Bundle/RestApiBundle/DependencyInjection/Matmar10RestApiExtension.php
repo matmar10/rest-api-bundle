@@ -2,14 +2,35 @@
 
 namespace Matmar10\Bundle\RestApiBundle\DependencyInjection;
 
+use Exception;
+
+use JMS\SerializerBundle\DependencyInjection\Configuration as JMSSerializerBundleConfiguration;
 use Matmar10\Bundle\RestApiBundle\DependencyInjection\Configuration;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Config\FileLocator;
 
-class Matmar10RestApiExtension extends Extension
+class Matmar10RestApiExtension extends Extension implements PrependExtensionInterface
 {
+
+    public function prepend(ContainerBuilder $container)
+    {
+        // get all bundles
+        $bundles = $container->getParameter('kernel.bundles');
+        // determine if AcmeGoodbyeBundle is registered
+        if (!isset($bundles['JMSSerializerBundle'])) {
+            throw new Exception('JMSSerializerBundle is not registered (did you add it to app/AppKernel.php?)');
+        }
+
+        $yamlParser = new Parser();
+        $yamlConfig = $yamlParser->parse(file_get_contents(__DIR__ . '/../Resources/config/jms_serializer_config.yml'));
+        $config = $this->processConfiguration(new JMSSerializerBundleConfiguration(), $yamlConfig);
+        $container->prependExtensionConfig('jms_serializer', $config);
+    }
+
     public function load(array $configs, ContainerBuilder $container)
     {
 

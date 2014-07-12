@@ -8,15 +8,12 @@ use JMS\Serializer\Annotation\Exclude;
 
 /**
  * An adaptor class to allow serialization of each constraints data via accessor methods
- *
- * @Serializer\ExclusionPolicy("all")
  */
 class ConstraintViolation
 {
 
     /**
      * @var \Symfony\Component\Validator\ConstraintViolationInterface
-     * @Exclude
      */
     protected $constraintViolation;
 

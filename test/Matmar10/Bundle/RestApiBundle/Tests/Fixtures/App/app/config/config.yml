@@ -7,3 +7,13 @@ framework:
     default_locale:  en  
     translator:      { fallback: en }
     profiler:        { only_exceptions: false }
+
+# jms_serializer:
+#     metadata:
+#         directories:
+#             WrappedException:
+#                 namespace_prefix: "Symfony\\Component"
+#                 path: "@Matmar10RestApiBundle/Resources/config/serializer"
+#             Test:
+#                 namespace_prefix: "Matmar10\\Bundle"
+#                 path: "@Matmar10RestApiBundle/Resources/config/serializer"

@@ -8,70 +8,31 @@ use JMS\Serializer\Annotation\Groups;
 use JMS\Serializer\Annotation\Type;
 use JMS\Serializer\Annotation\ReadOnly;
 use Matmar10\Bundle\RestApiBundle\Entity\ExceptionEntityInterface;
+use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
-/**
- * @ExclusionPolicy("none")
- */
-class ExceptionEntity implements ExceptionEntityInterface
+class ExceptionEntity extends FlattenException implements ExceptionEntityInterface, HttpExceptionInterface
 {
-
-    /**
-     * @Type("string")
-     * @Groups({"all", "debug"})
-     * @ReadOnly
-     */
-    protected $message;
-
-    /**
-     * @Type("integer")
-     * @Groups({"all", "debug"})
-     * @ReadOnly
-     */
-    protected $code;
-
-    /**
-     * @Type("string")
-     * @Groups({"debug"})
-     * @ReadOnly
-     */
-    protected $file;
-
-    /**
-     * @Type("integer")
-     * @Groups({"debug"})
-     * @ReadOnly
-     */
-    protected $line;
-
-    /**
-     * @Type("string")
-     * @Groups({"all", "debug"})
-     * @ReadOnly
-     */
-    protected $error;
-
-    /**
-     * @Type("string")
-     * @Groups({"debug"})
-     * @ReadOnly
-     */
-    protected $trace;
-
-    public function __construct(Exception $exception = null)
-    {
-        if(!is_null($exception)) {
-            $this->setException($exception);
-        }
-    }
-
     public function setException(Exception $exception)
     {
-        $this->message = $exception->getMessage();
-        $this->code = $exception->getCode();
-        $this->file = $exception->getFile();
-        $this->line = $exception->getLine();
-        $this->error = \get_class($exception);
-        $this->trace = $exception->getTraceAsString();
-    }
+        $this->setStatusCode($exception->getStatusCode());
+        $this->setHeaders($exception->getHeaders());
+        $this->setClass(get_class($exception));
+        $this->setMessage($exception->getMessage());
+        $this->setCode($exception->getCode());
 
+        if ($exception instanceof HttpExceptionInterface) {
+            /* @var $exception \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface */
+            $this->setStatusCode($exception->getStatusCode());
+            $this->setHeaders($exception->getHeaders());
+        }
+
+        $this->setTraceFromException($exception);
+        $this->setClass(get_class($exception));
+        $this->setFile($exception->getFile());
+        $this->setLine($exception->getLine());
+        if ($exception->getPrevious()) {
+            $this->setPrevious(static::create($exception->getPrevious()));
+        }
+    }
 }

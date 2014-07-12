@@ -1,0 +1,10 @@
+Matmar10\Bundle\RestApiBundle\Entity\ConstraintViolationList:
+    exclusion_policy: NONE
+    read_only: true
+    access_type: public_method
+    properties:
+        constraintViolations:
+            groups: [all, debug]
+            read_only: true
+            serialized_name: constraintViolations
+            type: array<Matmar10\Bundle\RestApiBundle\Entity\ConstraintViolation>

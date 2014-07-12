@@ -2,24 +2,53 @@
 
 namespace Matmar10\Bundle\RestApiBundle\Exception;
 
-use Matmar10\Bundle\RestApiBundle\Exception\StatusCodeInterface;
-use Matmar10\Bundle\RestApiBundle\Exception\SerializableExceptionInterface;
 use RuntimeException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
-class RestApiException extends RuntimeException implements StatusCodeInterface, SerializableExceptionInterface
+class RestApiException extends RuntimeException implements HttpExceptionInterface
 {
 
     const HTTP_STATUS_CODE_DEFAULT = 500;
 
-    protected $httpStatusCode = 500;
+    /**
+     * @var int
+     */
+    protected $statusCode = self::HTTP_STATUS_CODE_DEFAULT;
 
-    public function getHttpStatusCode()
+    /**
+     * @var array
+     */
+    protected $headers = array();
+
+    /**
+     * @return int
+     */
+    public function getStatusCode()
     {
-        return $this->httpStatusCode;
+        return $this->statusCode;
     }
 
-    public function getSerializationEntityClassName()
+    /**
+     * @return array
+     */
+    public function getHeaders()
     {
-        return 'Matmar10\Bundle\RestApiBundle\Entity\ExceptionEntity';
+        return $this->headers;
+    }
+
+    /**
+     * @param array $headers
+     */
+    public function setHeaders(array $headers)
+    {
+        $this->headers = $headers;
+    }
+
+    /**
+     * @param $statusCode
+     */
+    public function setStatusCode($statusCode)
+    {
+        $this->statusCode = $statusCode;
     }
 }

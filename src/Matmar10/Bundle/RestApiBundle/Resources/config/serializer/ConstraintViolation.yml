@@ -1,0 +1,33 @@
+Matmar10\Bundle\RestApiBundle\Entity\ConstraintViolation:
+    exclusion_policy: ALL
+    read_only: true
+    access_type: public_method
+    virtual_properties:
+        getMessage:
+            groups: [all, debug]
+            serialized_name: message
+        getMessageTemplate:
+            groups: [all, debug]
+            serialized_name: messageTemplate
+        getMessageParameters:
+            groups: [all, debug]
+            serialized_name: messageParameters
+        getMessageParameters:
+            groups: [all, debug]
+            serialized_name: messageParameters
+        getMessagePluralization:
+            groups: [all, debug]
+            serialized_name: messagePluralization
+        getRoot:
+            groups: [all, debug]
+            serialized_name: root
+        getPropertyPath:
+            groups: [all, debug]
+            serialized_name: propertyPath
+        getInvalidValue:
+            groups: [all, debug]
+            serialized_name: invalidValue
+        getCode:
+            groups: [all, debug]
+            serialized_name: code
+}

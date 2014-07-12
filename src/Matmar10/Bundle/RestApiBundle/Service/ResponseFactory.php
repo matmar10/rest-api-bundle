@@ -6,11 +6,14 @@ use Exception;
 use JMS\Serializer\Serializer;
 use JMS\Serializer\SerializationContext;
 use Matmar10\Bundle\RestApiBundle\Annotation\Api;
+use Matmar10\Bundle\RestApiBundle\Entity\ExceptionEntityInterface;
 use Matmar10\Bundle\RestApiBundle\Entity\ResponseEntity;
 use Matmar10\Bundle\RestApiBundle\Exception\SerializableExceptionInterface;
 use Matmar10\Bundle\RestApiBundle\Service\TypeNegotiator;
 use ReflectionClass;
 use Symfony\Bridge\Monolog\Logger;
+use Symfony\Component\Debug\Exception\FatalErrorException;
+use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -71,6 +74,12 @@ class ResponseFactory
         $this->defaultSerializeGroups = $defaultSerializeGroups;
     }
 
+    /**
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param \Matmar10\Bundle\RestApiBundle\Annotation\Api $annotation
+     * @param $content
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function buildSuccessfulResponse(Request $request, Api $annotation, $content)
     {
 
@@ -95,32 +104,17 @@ class ResponseFactory
         return $response;
     }
 
+    /**
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param \Matmar10\Bundle\RestApiBundle\Annotation\Api $annotation
+     * @param \Exception $exception
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function buildExceptionResponse(Request $request, Api $annotation, Exception $exception)
     {
 
         $serializeType = $this->typeNegotiator->getSerializeType($request);
-
-        if($exception instanceof SerializableExceptionInterface) {
-            /**
-             * @var $exception \Matmar10\Bundle\RestApiBundle\Exception\SerializableExceptionInterface
-             */
-            $mapToEntityClassName = $exception->getSerializationEntityClassName();
-            /**
-             * @var $exception \Matmar10\Bundle\RestApiBundle\Exception\StatusCodeInterface
-             */
-            $statusCode = $exception->getHttpStatusCode();
-        } else {
-            $mapToEntityClassName = $this->defaultMapToExceptionClassName;
-            $statusCode = $this->defaultExceptionStatusCode;
-        }
-
-        $reflectionObj = new ReflectionClass($mapToEntityClassName);
-        /**
-         * @var $exceptionEntity \Matmar10\Bundle\RestApiBundle\Entity\ExceptionEntityInterface
-         */
-        $exceptionEntity = $reflectionObj->newInstance();
-        $exceptionEntity->setException($exception);
-
+        $contentType = $this->typeNegotiator->getContentType($serializeType);
 
         // use groups if they are specified, otherwise use defaults
         $context = SerializationContext::create();
@@ -130,14 +124,29 @@ class ResponseFactory
             $context->setGroups($annotation->groups);
         }
 
-        $serializedContent = $this->serializer->serialize($exceptionEntity, $serializeType, $context);
-        $contentType = $this->typeNegotiator->getContentType($serializeType);
+        // use custom entity, if the exception is configured to
+        if($exception instanceof SerializableExceptionInterface) {
+            /**
+             * @var $exception \Matmar10\Bundle\RestApiBundle\Exception\SerializableExceptionInterface
+             */
+            $mapToEntityClassName = $exception->getSerializationEntityClassName();
+            $reflectionObj = new ReflectionClass($mapToEntityClassName);
+            /**
+             * @var $wrappedException \Matmar10\Bundle\RestApiBundle\Entity\ExceptionEntityInterface
+             */
+            $wrappedException = $reflectionObj->newInstance();
+            if(!($exception instanceof ExceptionEntityInterface)) {
+                throw new FatalErrorException('Exception entity classpath must implement Matmar10\Bundle\RestApiBundle\Entity\ExceptionEntityInterface');
+            }
+            $wrappedException->setException($exception);
+        }
 
-        $response = new Response();
-        $response->headers->set('Content-Type', $contentType);
-        $response->setContent($serializedContent);
-        $response->setStatusCode($statusCode);
-        return $response;
+        $wrappedException = FlattenException::create($exception, null, array(
+            'Content-Type', $contentType,
+        ));
+
+        $serializedContent = $this->serializer->serialize($wrappedException, $serializeType, $context);
+        return new Response($serializedContent, $wrappedException->getStatusCode(), $wrappedException->getHeaders());
     }
 
 }
