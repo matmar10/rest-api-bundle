@@ -1,9 +1,9 @@
 jms_serializer:
     metadata:
         directories:
-            SymfonyExceptions:
-                namespace_prefix: "Symfony\\Component\\Debug\\Exception"
-                path: "@Matmar10RestApiBundle/Resources/config/serializer"
-            RestApiExceptions:
+            symfony_component:
+               namespace_prefix: "Symfony\\Component"
+               path: "@Matmar10RestApiBundle/Resources/config/serializer/Symfony.Component"
+            rest_api_entities:
                 namespace_prefix: "Matmar10\\Bundle\\RestApiBundle\\Entity"
-                path: "@Matmar10RestApiBundle/Resources/config/serializer"
+                path: "@Matmar10RestApiBundle/Resources/config/serializer/Matmar10.Bundle.RestApiBundle.Entity"

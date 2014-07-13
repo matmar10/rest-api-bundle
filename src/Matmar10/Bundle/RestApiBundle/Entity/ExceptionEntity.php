@@ -11,7 +11,7 @@ use Matmar10\Bundle\RestApiBundle\Entity\ExceptionEntityInterface;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
-class ExceptionEntity extends FlattenException implements ExceptionEntityInterface, HttpExceptionInterface
+class ExceptionEntity extends FlattenException implements ExceptionEntityInterface
 {
     public function setException(Exception $exception)
     {

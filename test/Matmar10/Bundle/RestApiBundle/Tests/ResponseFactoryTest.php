@@ -2,13 +2,17 @@
 
 namespace Matmar10\Bundle\RestApiBundle\Tests;
 
+use Exception;
 use Matmar10\Bundle\RestApiBundle\Annotation\Api;
+use Matmar10\Bundle\RestApiBundle\Exception\ConstraintViolationException;
 use Matmar10\Bundle\RestApiBundle\Exception\ClientErrorRestApiException;
 use Matmar10\Bundle\RestApiBundle\Service\ResponseFactory;
 use Matmar10\Bundle\RestApiBundle\Service\TypeNegotiator;
 use Matmar10\Bundle\RestApiBundle\Tests\TestClasses\RestApiBundleTestClass;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationList;
 
 class ResponseFactoryTest extends WebTestCase
 {
@@ -93,6 +97,117 @@ class ResponseFactoryTest extends WebTestCase
             ),
         );
     }
+
+    /**
+     * @dataProvider provideTestBuildConstraintViolationListResponseData
+     */
+    public function testBuildConstraintViolationListResponse(Request $request, $annotationProperties, ConstraintViolationList $violations,
+                                                             $format, $expectedStatusCode, array $expectedSerializedFields)
+    {
+
+        $annotationObj = new Api();
+        foreach($annotationProperties as $key => $value) {
+            $annotationObj->$key = $value;
+        }
+
+        $exception = new ConstraintViolationException($violations);
+
+        $response = $this->factory->buildExceptionResponse($request, $annotationObj, $exception);
+        $this->assertEquals($expectedStatusCode, $response->getStatusCode());
+
+        switch($format) {
+            case 'json':
+                $deSerialized = json_decode($response->getContent(), true);
+                foreach($expectedSerializedFields as $field => $expectedValue) {
+                    $this->assertEquals($deSerialized[$field], $expectedValue);
+                }
+                break;
+            case 'xml':
+                $deSerialized = simplexml_load_string($response->getContent());
+                foreach($expectedSerializedFields as $field => $expectedValue) {
+
+                    if('constraintViolations' === $field) {
+                        /*
+                        $obj = new \stdClass();
+                        foreach($deSerialized->$field as $key => $value) {
+                            $obj->$key = $value;
+                        }
+                        $this->assertEquals($obj, $expectedValue);*/
+                        continue;
+                    }
+                    $this->assertEquals($expectedValue, $deSerialized->$field);
+                }
+                break;
+            default:
+                throw new Exception('Unexpected serialize type ' . $format);
+        }
+
+    }
+
+    public function provideTestBuildConstraintViolationListResponseData()
+    {
+
+        return array(
+            array(
+                new Request(array(), array(), array(), array(), array(), array(), array()),
+                array(),
+                new ConstraintViolationList(array(
+                    // $message, $messageTemplate, array $messageParameters, $root, $propertyPath, $invalidValue
+                    new ConstraintViolation('foo is an invalid value', '%s is an invalid value', array('foo'), 'value', 'value', 'foo'),
+                )),
+                'json',
+                400,
+                array(
+                    'message' => 'The entity was determined to be invalid by the entity validator.',
+                    'code' => 0,
+                    'constraintViolations' => array(
+                        array(
+                            'message' => 'foo is an invalid value',
+                            'messageTemplate' => '%s is an invalid value',
+                            'messageParameters' => array('foo'),
+                            'root' => 'value',
+                            'propertyPath' => 'value',
+                            'invalidValue' => 'foo',
+                        ),
+                    ),
+                ),
+            ),
+
+            /* array(
+               new Request(array(), array(), array(), array(), array(), array('HTTP_ACCEPT' => 'application/xml'), array()),
+               array(),
+               new ConstraintViolationList(array(
+                   // $message, $messageTemplate, array $messageParameters, $root, $propertyPath, $invalidValue
+                   new ConstraintViolation('foo is an invalid value', '%s is an invalid value', array('foo'), 'value', 'value', 'foo'),
+                   new ConstraintViolation('bar is an invalid value', '%s is an invalid value', array('bar'), 'value2', 'value2', 'bar'),
+               )),
+               'xml',
+               400,
+               array(
+                   'message' => 'The entity was determined to be invalid by the entity validator.',
+                   'code' => 0,
+                   'constraintViolations' => array(
+                       array(
+                           'message' => 'foo is an invalid value',
+                           'messageTemplate' => '%s is an invalid value',
+                           'messageParameters' => array('foo'),
+                           'root' => 'value',
+                           'propertyPath' => 'value',
+                           'invalidValue' => 'foo',
+                       ),
+                       array(
+                           'message' => 'bar is an invalid value',
+                           'messageTemplate' => '%s is an invalid value',
+                           'messageParameters' => array('bar'),
+                           'root' => 'value2',
+                           'propertyPath' => 'value2',
+                           'invalidValue' => 'bar',
+                       ),
+                   ),
+               ),
+           ), */
+        );
+    }
 /*
     public function testBuildExceptionJsonResponse()
     {
@@ -169,4 +284,6 @@ EOF;
 
     }
 */
+
+
 }

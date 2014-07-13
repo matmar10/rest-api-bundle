@@ -1,0 +1,32 @@
+Symfony\Component\Validator\ConstraintViolation:
+    exclusion_policy: ALL
+    read_only: true
+    access_type: public_method
+    properties:
+        message:
+            groups: [all, debug]
+            serialized_name: message
+        messageTemplate:
+            groups: [all, debug]
+            serialized_name: messageTemplate
+        messageParameters:
+            groups: [all, debug]
+            serialized_name: messageParameters
+        messageParameters:
+            groups: [all, debug]
+            serialized_name: messageParameters
+        messagePluralization:
+            groups: [all, debug]
+            serialized_name: messagePluralization
+        root:
+            groups: [all, debug]
+            serialized_name: root
+        propertyPath:
+            groups: [all, debug]
+            serialized_name: propertyPath
+        invalidValue:
+            groups: [all, debug]
+            serialized_name: invalidValue
+        code:
+            groups: [all, debug]
+            serialized_name: code

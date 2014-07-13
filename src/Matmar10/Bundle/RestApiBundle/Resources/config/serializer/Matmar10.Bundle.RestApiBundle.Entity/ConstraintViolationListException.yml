@@ -1,4 +1,5 @@
-Matmar10\Bundle\RestApiBundle\Entity\ConstraintViolationList:
+
+Matmar10\Bundle\RestApiBundle\Entity\ConstraintViolationListException:
     exclusion_policy: NONE
     read_only: true
     access_type: public_method
@@ -7,4 +8,6 @@ Matmar10\Bundle\RestApiBundle\Entity\ConstraintViolationList:
             groups: [all, debug]
             read_only: true
             serialized_name: constraintViolations
+            # see: https://github.com/matmar10/rest-api-bundle/issues/6
+            # type: array<Symfony\Component\Validator\ConstraintViolation>
             type: array<Matmar10\Bundle\RestApiBundle\Entity\ConstraintViolation>

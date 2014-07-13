@@ -1,0 +1,8 @@
+Symfony\Component\Validator\ConstraintViolationList:
+    exclusion_policy: ALL
+    read_only: true
+    properties:
+        violations:
+            groups: [all, debug]
+            serialized_name: violations
+            type: array<Symfony\Component\Validator\ConstraintViolation>

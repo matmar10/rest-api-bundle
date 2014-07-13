@@ -1,33 +1,34 @@
+
+# see: https://github.com/matmar10/rest-api-bundle/issues/6
 Matmar10\Bundle\RestApiBundle\Entity\ConstraintViolation:
     exclusion_policy: ALL
     read_only: true
     access_type: public_method
-    virtual_properties:
-        getMessage:
+    properties:
+        message:
             groups: [all, debug]
-            serialized_name: message
-        getMessageTemplate:
+            serialized_name: message_foo
+        messageTemplate:
             groups: [all, debug]
             serialized_name: messageTemplate
-        getMessageParameters:
+        messageParameters:
             groups: [all, debug]
             serialized_name: messageParameters
-        getMessageParameters:
+        messageParameters:
             groups: [all, debug]
             serialized_name: messageParameters
-        getMessagePluralization:
+        messagePluralization:
             groups: [all, debug]
             serialized_name: messagePluralization
-        getRoot:
+        root:
             groups: [all, debug]
             serialized_name: root
-        getPropertyPath:
+        propertyPath:
             groups: [all, debug]
             serialized_name: propertyPath
-        getInvalidValue:
+        invalidValue:
             groups: [all, debug]
             serialized_name: invalidValue
-        getCode:
+        code:
             groups: [all, debug]
             serialized_name: code
-}

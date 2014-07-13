@@ -2,6 +2,10 @@ Symfony\Component\Debug\Exception\FlattenException:
     exclusion_policy: ALL
     read_only: true
     access_type: public_method
+    # discriminator:
+    #     field_name: class
+    #     map:
+    #         Matmar10\\Bundle\\RestApiBundle\\Exception\\ConstraintViolationException: Matmar10\\Bundle\\RestApiBundle\\Entity\\ConstraintViolationListException
     properties:
         message:
             type: string
@@ -21,3 +25,5 @@ Symfony\Component\Debug\Exception\FlattenException:
         line:
             type: integer
             groups: [all, debug]
+
+

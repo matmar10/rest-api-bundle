@@ -109,6 +109,7 @@ class ResponseFactory
      * @param \Matmar10\Bundle\RestApiBundle\Annotation\Api $annotation
      * @param \Exception $exception
      * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \Symfony\Component\Debug\Exception\FatalErrorException
      */
     public function buildExceptionResponse(Request $request, Api $annotation, Exception $exception)
     {
@@ -135,17 +136,21 @@ class ResponseFactory
              * @var $wrappedException \Matmar10\Bundle\RestApiBundle\Entity\ExceptionEntityInterface
              */
             $wrappedException = $reflectionObj->newInstance();
-            if(!($exception instanceof ExceptionEntityInterface)) {
+            if(!($wrappedException instanceof ExceptionEntityInterface)) {
                 throw new FatalErrorException('Exception entity classpath must implement Matmar10\Bundle\RestApiBundle\Entity\ExceptionEntityInterface');
             }
             $wrappedException->setException($exception);
+            $wrappedException->setHeaders(array(
+                'Content-Type', $contentType,
+            ));
+        } else {
+            $wrappedException = FlattenException::create($exception, null, array(
+                'Content-Type', $contentType,
+            ));
         }
 
-        $wrappedException = FlattenException::create($exception, null, array(
-            'Content-Type', $contentType,
-        ));
-
         $serializedContent = $this->serializer->serialize($wrappedException, $serializeType, $context);
+
         return new Response($serializedContent, $wrappedException->getStatusCode(), $wrappedException->getHeaders());
     }
 

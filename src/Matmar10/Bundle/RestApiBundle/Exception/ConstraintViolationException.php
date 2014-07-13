@@ -4,6 +4,7 @@ namespace Matmar10\Bundle\RestApiBundle\Exception;
 
 use Matmar10\Bundle\RestApiBundle\Exception\ClientErrorRestApiException;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Symfony\Component\Validator\ConstraintViolation;
 
 class ConstraintViolationException extends ClientErrorRestApiException implements SerializableExceptionInterface
 {
@@ -44,6 +45,6 @@ class ConstraintViolationException extends ClientErrorRestApiException implement
      */
     public function getSerializationEntityClassName()
     {
-        return 'Matmar10\Bundle\RestApiBundle\Entity\ConstraintViolationList';
+        return 'Matmar10\Bundle\RestApiBundle\Entity\ConstraintViolationListException';
     }
 }
