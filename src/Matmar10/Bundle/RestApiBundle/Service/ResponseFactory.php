@@ -141,11 +141,11 @@ class ResponseFactory
             }
             $wrappedException->setException($exception);
             $wrappedException->setHeaders(array(
-                'Content-Type', $contentType,
+                'Content-Type' => $contentType,
             ));
         } else {
             $wrappedException = FlattenException::create($exception, null, array(
-                'Content-Type', $contentType,
+                'Content-Type' => $contentType,
             ));
         }
 
